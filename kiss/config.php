@@ -1,15 +1,20 @@
-﻿
-
-<?php 
+﻿<?php
 	
 //===============================================
 // Includes
 //===============================================
 require('kissmvc.php');
-	//GLOBAL VARIBALES
-	$GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
+
+
+//===============================================
+// 全局变量
+//===============================================
+$GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 	
-	
+
+//===============================================
+// 数据库
+//===============================================
 	//=====================================================
 	class tabActivity extends Model
 	{
@@ -119,10 +124,6 @@ require('kissmvc.php');
 		}
 	}
 	
-
-
-
-
 	//====================================
 	//====================================	
 	function getdbh()
@@ -143,4 +144,91 @@ require('kissmvc.php');
 		return $GLOBALS['dbh'];
 	}
 
+
+//===============================================
+// 全局PHP内部函数
+//===============================================
+
+function template($iactive=1)
+{
+  echo "template";
+}
+
 ?>
+
+
+
+<?php 
+//===============================================
+// 全局HTML块函数
+//===============================================
+?>
+
+<?php function sideNavigationBlock($subfolder) { 
+	$pages = array(
+		array("","首页"),
+		array("myinfo","我的信息"),
+		array("activity","课程"),
+		array("news","通知"),
+		array("comments","评论"),
+		array("file","文件资源")
+	);
+	?>
+    <ul class="nav bs-sidenav nav-pills nav-stacked">
+		
+		<?php 
+			foreach ($pages as $page1){ ?>
+		    <li <?php if(strcmp($subfolder,$page1[0])==0) echo "class='active'"; ?> >
+				<a href="<?php echo $GLOBALS['gSiteRootPath'].$page1[0];?>"><?php echo $page1[1];?></a>
+			</li>
+		<?php }	?>
+
+	</ul>
+<?php } ?>
+
+<?php function activityBlock($nshow=1) { ?>
+    <div class="list-group">
+		<?php 
+			$act = new tabActivity();
+			$act_array = $act->retrieve_many("serial>0 ORDER BY utime DESC");
+			foreach ($act_array as $act) { ?>
+
+			<a class="list-group-item active2" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
+				<h4 class="list-group-item-heading"><strong><?php echo $act->get('title');?></strong></h4>
+			</a>
+
+			<?php 
+				$les = new tabLesson();
+				$les_array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
+				$i=0;
+				$nles=count($les_array);
+				foreach( $les_array as $les ) { ?>
+
+				<a class="list-group-item" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?lesserial='.$les->get('serial'); ?>" >
+					<h5 class="list-group-item-heading">
+						<?php echo $les->get('title');?>
+						<span class="label label-success text-right">剩余<?php 
+							$order = new tabLesorder();
+							$nsel = $order->select("count(stuserial) as nsel","lesserial=?",$les->get('serial'));
+							echo $les->get('maxnum')-$nsel['nsel'];
+						?></span>
+					</h5>
+				    <p class="list-group-item-text"><small><?php echo $les->get('desc');?></small></p>
+
+				</a>
+				<?php $i=$i+1 ; if($i>=$nshow) break ; ?>
+
+			<?php }	?>
+			<?php if( $nshow<$nles ) { ?>
+				<a class="list-group-item" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
+					<p class="list-group-item-text"><small>更多...</small></p>
+				</a>
+			<?php } ?>
+			<hr>
+
+		<?php }	?>
+
+	</div>
+<?php } ?>
+
+

@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>通知</title>
+    <title>PPT资源</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../css/bootstrap.css" rel="stylesheet">
@@ -63,7 +63,7 @@
 					<div class="col-md-2 column ">
 						<div class="bs-sidebar hidden-print affix" role="complementary">
 						  <!-- side navigation -->
-						  <?php sideNavigationBlock("news");?>
+						  <?php sideNavigationBlock("file");?>
 					  </div>
 					</div>
 					<div class="col-md-6 column">

@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>通知</title>
+    <title>Starter Template for Bootstrap</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../css/bootstrap.css" rel="stylesheet">
@@ -62,8 +62,34 @@
 				<div class="row clearfix">
 					<div class="col-md-2 column ">
 						<div class="bs-sidebar hidden-print affix" role="complementary">
-						  <!-- side navigation -->
-						  <?php sideNavigationBlock("news");?>
+						  <ul class="nav bs-sidenav nav-pills nav-stacked">
+							<li class="active">
+								<a href="#">首页</a>
+							</li>
+							<li>
+								<a href="#">我的信息</a>
+							</li>
+							<li>
+								<a href="#">查看通知</a>
+							</li>
+							<li>
+								<a href="#">查看评论</a>
+							</li>
+							<hr>
+							<li>
+								<a href="#" class="disabled">课程</a>
+							</li>
+							<li>
+								<a href="#">博士生论坛</a>
+							</li>
+							<li>
+								<a href="#">预约开题</a>
+							</li>
+							<hr>
+							<li>
+								<a href="#">查看PPT</a>
+							</li>
+						</ul>
 					  </div>
 					</div>
 					<div class="col-md-6 column">

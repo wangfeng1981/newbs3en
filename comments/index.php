@@ -62,29 +62,8 @@
 				<div class="row clearfix">
 					<div class="col-md-2 column ">
 						<div class="bs-sidebar hidden-print affix" role="complementary">
-						  <ul class="nav bs-sidenav nav-pills nav-stacked">
-							<!-- side navigation -->
-							<li >
-								<a href="<?php echo $GLOBALS['gSiteRootPath'];?>"><strong>首页</strong></a>
-							</li>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'myinfo/';?>">我的信息</a>
-							</li>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'news/';?>">查看通知</a>
-							</li>
-							<li class="active">
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">查看评论</a>
-							</li>
-							<hr>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'activity/';?>"><span class="label label-primary">课程</span></a>
-							</li>
-							<hr>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'ppt/';?>">查看PPT</a>
-							</li>
-						</ul>
+						  <!-- side navigation -->
+						  <?php sideNavigationBlock("comments");?>
 					  </div>
 					</div>
 					<div class="col-md-6 column">
