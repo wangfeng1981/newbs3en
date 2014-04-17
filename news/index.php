@@ -1,4 +1,6 @@
-﻿
+﻿<?php session_start(); ?>
+<?php require('../kiss/config.php'); ?>
+
 <!DOCTYPE html>
 <html lang="zh-cn">
   <head>
@@ -8,14 +10,14 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Starter Template for Bootstrap</title>
+    <title>通知</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
-	<link href="css/docs.min.css" rel="stylesheet">
+    <link href="../css/bootstrap.css" rel="stylesheet">
+	<link href="../css/jfwfdocs.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-	<link href="css/jfwf.css" rel="stylesheet">
+	<link href="../css/jfwf.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -61,31 +63,26 @@
 					<div class="col-md-2 column ">
 						<div class="bs-sidebar hidden-print affix" role="complementary">
 						  <ul class="nav bs-sidenav nav-pills nav-stacked">
-							<li class="active">
-								<a href="#">首页</a>
+							<!-- side navigation -->
+							<li>
+								<a href="<?php echo $GLOBALS['gSiteRootPath'];?>"><strong>首页</strong></a>
 							</li>
 							<li>
-								<a href="#">我的信息</a>
+								<a href="<?php echo $GLOBALS['gSiteRootPath'].'myinfo/';?>">我的信息</a>
+							</li>
+							<li  class="active">
+								<a href="<?php echo $GLOBALS['gSiteRootPath'].'news/';?>">查看通知</a>
 							</li>
 							<li>
-								<a href="#">查看通知</a>
-							</li>
-							<li>
-								<a href="#">查看评论</a>
-							</li>
-							<hr>
-							<li>
-								<a href="#" class="disabled">课程</a>
-							</li>
-							<li>
-								<a href="#">博士生论坛</a>
-							</li>
-							<li>
-								<a href="#">预约开题</a>
+								<a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">查看评论</a>
 							</li>
 							<hr>
 							<li>
-								<a href="#">查看PPT</a>
+								<a href="<?php echo $GLOBALS['gSiteRootPath'].'activity/';?>"><span class="label label-primary">课程</span></a>
+							</li>
+							<hr>
+							<li>
+								<a href="<?php echo $GLOBALS['gSiteRootPath'].'ppt/';?>">查看PPT</a>
 							</li>
 						</ul>
 					  </div>
@@ -229,6 +226,6 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
   </body>
 </html>
