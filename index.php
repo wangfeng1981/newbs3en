@@ -57,7 +57,7 @@
 					<div class="col-md-2 column ">
 						<div class="bs-sidebar hidden-print affix" role="complementary">
 						  <!-- side navigation -->
-						  <?php sideNavigationBlock("");?>
+						  <?php sideNavigationBlock(""); ?>
 					  	</div>
 					</div>
 					<div class="col-md-6 column">
@@ -143,10 +143,22 @@
 								<p class="jfwfupdate text-right">2014.4.20</p>
 							</div>
 						</div>
+
+
 						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Yang</h4>
-							<p>通知3... ... ... ...。</p>
-							<p class="jfwfupdate">2014.4.15</p>
+							<table class="table" >
+								<tr>
+									<td style="padding 2px; margin: 2px ">
+										<img src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
+									</td>
+									<td style="padding 2px; margin: 2px ">
+										<h5>Teacher Yang</h5>
+										<p>通知3... ... ... ...。</p>
+										<p class="jfwfupdate">2014.4.15</p>
+									</td>
+								</tr>
+							</table>
+							
 						</div>
 						<div class="bs-callout bs-callout-info">
 							<h4>Teacher Yang</h4>

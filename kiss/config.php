@@ -168,6 +168,7 @@ function template($iactive)
 // 全局HTML块函数
 //===============================================
 ?>
+
 <?php function sideNavigationBlock($subfolder) { 
 	$pages = array(
 		array("","首页"),
