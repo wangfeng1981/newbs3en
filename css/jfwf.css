@@ -12,3 +12,12 @@ p.jfwfupdate {
   font-size: 80%;
   color: #999;
 }
+
+
+div.jfwfcmtYellow
+{
+	border-style: solid; 
+	border-width: 0px;
+  	border-left:1px double #ff0000;
+  	background-color: #ffff00;
+}

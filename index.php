@@ -56,62 +56,13 @@
 				<div class="row clearfix">
 					<div class="col-md-2 column ">
 						<div class="bs-sidebar hidden-print affix" role="complementary">
-						  <ul class="nav bs-sidenav nav-pills nav-stacked">
-						  	<!-- side navigation -->
-							<li class="active">
-								<a href="<?php echo $GLOBALS['gSiteRootPath'];?>"><strong>首页</strong></a>
-							</li>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'myinfo/';?>">我的信息</a>
-							</li>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'news/';?>">查看通知</a>
-							</li>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">查看评论</a>
-							</li>
-							<hr>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'activity/';?>"><span class="label label-primary">课程</span></a>
-							</li>
-							<hr>
-							<li>
-								<a href="<?php echo $GLOBALS['gSiteRootPath'].'ppt/';?>">查看PPT</a>
-							</li>
-						</ul>
-					  </div>
+						  <!-- side navigation -->
+						  <?php sideNavigationBlock("");?>
+					  	</div>
 					</div>
 					<div class="col-md-6 column">
-						<div class="list-group">
-							<div class="list-group-item-first">
-								<h3>博士学术论坛</h3>
-							</div>
-							<a href="#" class="list-group-item" >
-								<h4 class="list-group-item-heading">
-									2014年第一期
-								</h4>
-								<p class="list-group-item-text">
-									2014年5月1日 奥运园区A501.
-								</p>
-								<span class="label label-success">剩余14</span>
-								<p class="jfwfupdate">2014.4.25</p>
-							</a>
-						</div>
-						<div class="list-group">
-							<div class="list-group-item-first">
-								<h3>开题</h3>
-							</div>
-							<a href="#" class="list-group-item" >
-								<h4 class="list-group-item-heading">
-									2014年第一期
-								</h4>
-								<p class="list-group-item-text">
-									2014年春季开题的同学请加入该批次.
-								</p>
-								<span class="label label-success">剩余14</span>
-								<p class="jfwfupdate">2014.5.25</p>
-							</a>
-						</div>
+						<!-- 课程分类列表 -->
+						<?php activityBlock(1); ?>
 						
 						
 						<hr>
@@ -153,22 +104,44 @@
 						
 					</div>
 					<div class="col-md-4 column">
-						<h3>最新通知(5)</h3>
+						<h4><strong>最新通知</strong></h4>
 						<hr>
 						<div class="bs-callout bs-callout-warning">
-							<h4>Teacher Yang</h4>
-							<p>这是置顶通知，请详细阅读。。。。。。</p>
-							<p class="jfwfupdate">2014.4.1</p>
+							<div class="media">
+							  <a class="pull-left" href="#">
+								<img class="media-object" src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
+							  </a>
+							  <div class="media-body">
+								<h5>王老师</h5>
+								<p>这是置顶通知，请详细阅读。。。。。。</p>
+								<p class="jfwfupdate">2014.5.2</p>
+							  </div>
+							</div>
+						</div>
+
+
+
+						<div class="bs-callout bs-callout-info">
+							<div class="jfwfcmtYellow">
+								<div>
+									<img class="media-object" src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
+								</div>
+								<div>
+									<h4>Teacher Yang</h4>
+									<p>这是普通通知，请详细阅读。。。。。。</p>
+									<p class="jfwfupdate">2014.5.1</p>
+								</div>
+							</div>
 						</div>
 						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Yang</h4>
-							<p>这是普通通知，请详细阅读。。。。。。</p>
-							<p class="jfwfupdate">2014.5.1</p>
-						</div>
-						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Wang</h4>
-							<p>通知2... ... ... ...。</p>
-							<p class="jfwfupdate">2014.4.20</p>
+							<div style="display:inline-block;vertical-align:top">
+								<img src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
+							</div>
+							<div style="display:inline-block;padding=2px">
+								<h4>Teacher Wang</h4>
+								<p>通知2... ... ... ...。</p>
+								<p class="jfwfupdate text-right">2014.4.20</p>
+							</div>
 						</div>
 						<div class="bs-callout bs-callout-info">
 							<h4>Teacher Yang</h4>
