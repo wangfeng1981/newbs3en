@@ -106,65 +106,82 @@
 					<div class="col-md-4 column">
 						<h4><strong>最新通知</strong></h4>
 						<hr>
-						<div class="bs-callout bs-callout-warning">
-							<div class="media">
-							  <a class="pull-left" href="#">
-								<img class="media-object" src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
-							  </a>
-							  <div class="media-body">
-								<h5>王老师</h5>
-								<p>这是置顶通知，请详细阅读。。。。。。</p>
-								<p class="jfwfupdate">2014.5.2</p>
-							  </div>
-							</div>
+						
+						<div class="jcomment">
+						  <div class="jcomment-photo">
+						  	<img src="photos/1-1.jpg">
+						  </div>
+						  <div class="jcomment-header">
+						    孙俪
+						  </div>
+						  <div class="jcomment-body">
+						    我选择了2014年第一期开题，欢迎大家参加.
+						  </div>
+						  <div class="jcomment-footer">
+						  	2014年1月1日 23:53 <a href="#">评论(2)</a>
+						  </div>
 						</div>
 
-
-
-						<div class="bs-callout bs-callout-info">
-							<div class="jfwfcmtYellow">
-								<div>
-									<img class="media-object" src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
-								</div>
-								<div>
-									<h4>Teacher Yang</h4>
-									<p>这是普通通知，请详细阅读。。。。。。</p>
-									<p class="jfwfupdate">2014.5.1</p>
-								</div>
-							</div>
-						</div>
-						<div class="bs-callout bs-callout-info">
-							<div style="display:inline-block;vertical-align:top">
-								<img src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
-							</div>
-							<div style="display:inline-block;padding=2px">
-								<h4>Teacher Wang</h4>
-								<p>通知2... ... ... ...。</p>
-								<p class="jfwfupdate text-right">2014.4.20</p>
-							</div>
+						<div class="jcomment-admin">
+						  <div class="jcomment-photo">
+						  	<img src="photos/1-2.jpg">
+						  </div>
+						  <div class="jcomment-header-admin">
+						    李老师
+						  </div>
+						  <div class="jcomment-body">
+						    我选择了2014年第一期开题，欢迎大家参加.
+						  </div>
+						  <div class="jcomment-footer">
+						  	2014年1月1日 23:53 <a href="#">评论(2)</a>
+						  </div>
 						</div>
 
+						<div class="jcomment-admin-top">
+						  <div class="jcomment-photo">
+						    <img src="photos/1-3.jpg">
+						  </div>
+						  <div class="jcomment-header-admin-top">
+						    李老师
+						  </div>
+						  <div class="jcomment-body">
+						    我选择了2014年第一期开题，欢迎大家参加.
+						  </div>
+						  <div class="jcomment-footer">
+						    2014年1月1日 23:53 <a href="#">评论(2)</a>
+						  </div>
+						</div>
 
-						<div class="bs-callout bs-callout-info">
-							<table class="table" >
-								<tr>
-									<td style="padding 2px; margin: 2px ">
-										<img src="photos/teacher.jpg" alt="pdf"  width="32" height="32">
-									</td>
-									<td style="padding 2px; margin: 2px ">
-										<h5>Teacher Yang</h5>
-										<p>通知3... ... ... ...。</p>
-										<p class="jfwfupdate">2014.4.15</p>
-									</td>
-								</tr>
-							</table>
-							
+						<div class="jcomment-admin-reply">
+						  <div class="jcomment-photo">
+						    <img src="photos/1-4.jpg">
+						  </div>
+						  <div class="jcomment-header-admin">
+						    李老师
+						  </div>
+						  <div class="jcomment-body">
+						    我选择了2014年第一期开题，欢迎大家参加.
+						  </div>
+						  <div class="jcomment-footer">
+						    2014年1月1日 23:53 <a href="#">评论(2)</a>
+						  </div>
 						</div>
-						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Yang</h4>
-							<p>通知4... ... ... ...。</p>
-							<p class="jfwfupdate">2014.4.10</p>
+
+						<div class="jcomment-reply">
+						  <div class="jcomment-photo">
+						    <img src="photos/1-5.jpg">
+						  </div>
+						  <div class="jcomment-header">
+						    李老师
+						  </div>
+						  <div class="jcomment-body">
+						    我选择了2014年第一期开题，欢迎大家参加.
+						  </div>
+						  <div class="jcomment-footer">
+						    2014年1月1日 23:53 <a href="#">评论(2)</a>
+						  </div>
 						</div>
+
 						<hr>
 						<h3>最新留言(5)</h3>
 						<hr>

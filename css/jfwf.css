@@ -21,3 +21,96 @@ div.jfwfcmtYellow
   	border-left:1px double #ff0000;
   	background-color: #ffff00;
 }
+
+.jcomment,
+.jcomment-reply,
+.jcomment-admin,
+.jcomment-admin-reply,
+.jcomment-admin-top
+{
+	background-color: #eeffee;
+	position: relative;
+	border-left: 4px solid green;
+	padding: 5px;
+	margin: 5px;
+}
+.jcomment-reply,
+.jcomment-admin-reply
+{
+	margin-left: 30px;
+}
+.jcomment-admin,
+.jcomment-admin-reply
+{
+	background-color: #eeeeff;
+	border-left: 4px solid rgb(42,92,149);
+}
+.jcomment-admin-top
+{
+	background-color: #ffffee;
+	border-left: 4px solid #f0ad4e;
+}
+
+.jcomment-header,
+.jcomment-header-admin,
+.jcomment-header-admin-top
+{
+	position: relative;
+	background-color: transparent;
+	margin-left: 60px;
+	font-weight: bold;
+	font-size: 16px;
+	color: green;
+}
+.jcomment-header-admin
+{
+	color: rgb(42,92,149);
+}
+.jcomment-header-admin-top
+{
+	color: #f0ad4e;
+}
+
+
+.jcomment-photo{
+	width: 50px;
+	height: 50px;
+	margin: 0px;
+	padding: 0px;
+	background-color: #88ff88 ;
+	position: absolute;
+	top:5px;
+	left:5px;
+	z-index: 3;
+
+}
+.jcomment-header
+{
+	position: relative;
+	background-color: transparent;
+	margin-left: 60px;
+	font-weight: bold;
+	font-size: 16px;
+	color: green;
+}
+.jcomment-body{
+	background-color: transparent;
+	margin: 4px;
+	padding: 0px;
+	z-index: 2;
+	margin-left: 60px;
+	font-size: 14px;
+}
+.jcomment-footer
+{
+	background-color: transparent;
+	margin: 4px;
+	margin-left: 60px;
+	font-size: 12px;
+	color: gray;
+}
+.jcomment-footer a{
+	float: right;
+	display: block;
+}
+
