@@ -155,6 +155,15 @@ $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 // 全局PHP内部函数
 //===============================================
 
+//timeStamp美国东部时间转上海时间
+function edt2sh($timestamp) {
+
+	$date = new DateTime('2000-01-01', new DateTimeZone('America/New_York'));
+	$date->setTimestamp($timestamp);
+    $date->setTimezone(new DateTimeZone('Asia/Shanghai'));
+    return $date->format("Y年m月d日 G:i:s");
+}
+
 function template($iactive)
 {
   echo "template";
@@ -170,6 +179,7 @@ function template($iactive)
 ?>
 
 <?php function sideNavigationBlock($subfolder) { 
+	//侧边导航栏
 	$pages = array(
 		array("","首页"),
 		array("myinfo","我的信息"),
@@ -191,7 +201,9 @@ function template($iactive)
 	</ul>
 <?php } ?>
 
-<?php function activityBlock($nshow=1) { ?>
+<?php function activityBlock($nshow=1) { 
+	//课程分类及相关批次课程摘要显示
+	?>
     <div class="list-group">
 		<?php 
 			$act = new tabActivity();
@@ -234,4 +246,140 @@ function template($iactive)
 		<?php }	?>
 
 	</div>
+<?php } ?>
+
+<?php function newsBlock($nshow=5,$ipage=0) { 
+	//最新通知显示 $ipage is zero based.
+	/*
+	SELECT news_table.message AS msg, admin_table.adminname AS name
+		FROM news_table, admin_table
+		WHERE news_table.byadminserial = admin_table.serial
+		GROUP BY admin_table.serial
+		ORDER BY news_table.utime DESC 
+		LIMIT 0 , 30
+
+		<div class="jcomment">
+		  <div class="jcomment-photo">
+		  	<img src="photos/1-1.jpg">
+		  </div>
+		  <div class="jcomment-header">
+		    孙俪
+		  </div>
+		  <div class="jcomment-body">
+		    我选择了2014年第一期开题，欢迎大家参加.
+		  </div>
+		  <div class="jcomment-footer">
+		  	2014年1月1日 23:53 <a href="#">评论(2)</a>
+		  </div>
+		</div>
+	*/
+
+	?>
+
+		<?php 
+			$news=new tabNews();
+			$ncnt=$news->select("count(serial) as cnt");
+			$totalNumNews=0+$ncnt['cnt'];
+			$startindex=$ipage*$nshow;
+			$npage=ceil($totalNumNews/$nshow);
+
+			$selstr="news_table.serial as nserial, news_table.message as nmessage, news_table.utime as nutime, news_table.ontop as nontop, admin_table.adminname as aname, admin_table.photo as aphoto";
+			$frmstr="news_table,admin_table";
+			$whrstr="news_table.byadminserial=admin_table.serial GROUP BY news_table.serial ORDER BY news_table.ontop DESC, news_table.utime DESC LIMIT ".$startindex.",".$nshow ;
+
+			$news = new tabNews() ;
+			$news_array = $news->select_mt($selstr,$frmstr,$whrstr);
+
+			foreach ($news_array as $news) { ?>
+
+				<div class="jcomment-admin<?php if($news['nontop']==1) echo '-top';?>">
+				  <div class="jcomment-photo">
+				  	<img src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$news['aphoto'];?>" width='50' height='50'>
+				  </div>
+				  <div class="jcomment-header-admin<?php if($news['nontop']==1) echo '-top';?>">
+				    <?php echo $news['aname'];?>
+				  </div>
+				  <div class="jcomment-body">
+				    <?php echo $news['nmessage'];?>
+				  </div>
+				  <div class="jcomment-footer">
+				  	<?php echo edt2sh($news['nutime']);?>
+				  </div>
+				</div>
+
+		<?php }	?>
+
+		<?php if( $ipage==0 && $totalNumNews>$nshow ) { ?>
+			<div class="jcomment-admin"><a href="<?php echo $GLOBALS['gSiteRootPath'].'news/';?>">更多... ...</a></div>
+		<?php } /*if( $ipage==0 && $totalNumNews>$nshow )*/ ?>
+
+
+<?php } ?>
+
+
+<?php function commentsBlock($nshow=5,$ipage=0) { 
+	//最新评论显示 $ipage is zero based.
+	/*
+	SELECT news_table.message AS msg, admin_table.adminname AS name
+		FROM news_table, admin_table
+		WHERE news_table.byadminserial = admin_table.serial
+		GROUP BY admin_table.serial
+		ORDER BY news_table.utime DESC 
+		LIMIT 0 , 30
+
+		<div class="jcomment">
+		  <div class="jcomment-photo">
+		  	<img src="photos/1-1.jpg">
+		  </div>
+		  <div class="jcomment-header">
+		    孙俪
+		  </div>
+		  <div class="jcomment-body">
+		    我选择了2014年第一期开题，欢迎大家参加.
+		  </div>
+		  <div class="jcomment-footer">
+		  	2014年1月1日 23:53 <a href="#">评论(2)</a>
+		  </div>
+		</div>
+	*/
+
+	?>
+
+		<?php 
+			$cmt=new tabComments();
+			$ncnt=$cmt->select("count(serial) as cnt");
+			$totalNumNews=0+$ncnt['cnt'];
+			$startindex=$ipage*$nshow;
+			$npage=ceil($totalNumNews/$nshow);
+
+
+			$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, comments_table.replyserial as creply, student_table.stuname as sname, student_table.photo as sphoto";
+			$frmstr="comments_table,student_table";
+			$whrstr="comments_table.bystuserial=student_table.serial GROUP BY comments_table.serial ORDER BY comments_table.utime DESC LIMIT ".$startindex.",".$nshow ;
+
+			$cmt = new tabComments() ;
+			$cmt_array = $cmt->select_mt($selstr,$frmstr,$whrstr);
+
+			foreach ($cmt_array as $cmt) { ?>
+
+				<div class="jcomment<?php if($cmt['creply']>0) echo '-reply';?>">
+				  <div class="jcomment-photo">
+				  	<img src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$cmt['sphoto'];?>" width='50' height='50'>
+				  </div>
+				  <div class="jcomment-header">
+				    <?php echo $cmt['sname'];?>
+				  </div>
+				  <div class="jcomment-body">
+				    <?php echo $cmt['cmessage'];?>
+				  </div>
+				  <div class="jcomment-footer">
+				  	<?php echo edt2sh($cmt['cutime']);?>
+				  </div>
+				</div>
+
+		<?php }	?>
+		<?php if( $ipage==0 && $totalNumNews>$nshow ) { ?>
+			<div class="jcomment"><a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">更多... ...</a></div>
+		<?php } /*if( $ipage==0 && $totalNumNews>$nshow )*/ ?>
+
 <?php } ?>

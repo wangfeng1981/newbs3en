@@ -369,4 +369,18 @@ abstract class KISS_Model  {
     $stmt->execute();
     return $stmt->fetchAll($pdo_fetch_mode);
   }
+  function select_mt($selectwhat='*',$fromtabnames='',$wherewhat='',$bindings='',$pdo_fetch_mode=PDO::FETCH_ASSOC) {
+    $dbh=$this->getdbh();
+    if (is_scalar($bindings))
+      $bindings=trim($bindings) ? array($bindings) : array();
+    $sql = 'SELECT '.$selectwhat.' FROM '.$fromtabnames;
+    if ($wherewhat)
+      $sql .= ' WHERE '.$wherewhat;
+    $stmt = $dbh->prepare($sql);
+    $i=0;
+    foreach($bindings as $v)
+      $stmt->bindValue(++$i,$v);
+    $stmt->execute();
+    return $stmt->fetchAll($pdo_fetch_mode);
+  }
 }

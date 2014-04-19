@@ -103,113 +103,18 @@
 						</div>
 						
 					</div>
+
 					<div class="col-md-4 column">
 						<h4><strong>最新通知</strong></h4>
 						<hr>
-						
-						<div class="jcomment">
-						  <div class="jcomment-photo">
-						  	<img src="photos/1-1.jpg">
-						  </div>
-						  <div class="jcomment-header">
-						    孙俪
-						  </div>
-						  <div class="jcomment-body">
-						    我选择了2014年第一期开题，欢迎大家参加.
-						  </div>
-						  <div class="jcomment-footer">
-						  	2014年1月1日 23:53 <a href="#">评论(2)</a>
-						  </div>
-						</div>
-
-						<div class="jcomment-admin">
-						  <div class="jcomment-photo">
-						  	<img src="photos/1-2.jpg">
-						  </div>
-						  <div class="jcomment-header-admin">
-						    李老师
-						  </div>
-						  <div class="jcomment-body">
-						    我选择了2014年第一期开题，欢迎大家参加.
-						  </div>
-						  <div class="jcomment-footer">
-						  	2014年1月1日 23:53 <a href="#">评论(2)</a>
-						  </div>
-						</div>
-
-						<div class="jcomment-admin-top">
-						  <div class="jcomment-photo">
-						    <img src="photos/1-3.jpg">
-						  </div>
-						  <div class="jcomment-header-admin-top">
-						    李老师
-						  </div>
-						  <div class="jcomment-body">
-						    我选择了2014年第一期开题，欢迎大家参加.
-						  </div>
-						  <div class="jcomment-footer">
-						    2014年1月1日 23:53 <a href="#">评论(2)</a>
-						  </div>
-						</div>
-
-						<div class="jcomment-admin-reply">
-						  <div class="jcomment-photo">
-						    <img src="photos/1-4.jpg">
-						  </div>
-						  <div class="jcomment-header-admin">
-						    李老师
-						  </div>
-						  <div class="jcomment-body">
-						    我选择了2014年第一期开题，欢迎大家参加.
-						  </div>
-						  <div class="jcomment-footer">
-						    2014年1月1日 23:53 <a href="#">评论(2)</a>
-						  </div>
-						</div>
-
-						<div class="jcomment-reply">
-						  <div class="jcomment-photo">
-						    <img src="photos/1-5.jpg">
-						  </div>
-						  <div class="jcomment-header">
-						    李老师
-						  </div>
-						  <div class="jcomment-body">
-						    我选择了2014年第一期开题，欢迎大家参加.
-						  </div>
-						  <div class="jcomment-footer">
-						    2014年1月1日 23:53 <a href="#">评论(2)</a>
-						  </div>
-						</div>
+						<!-- news -->
+						<?php newsBlock(); ?>
 
 						<hr>
-						<h3>最新留言(5)</h3>
+						<h4>最新留言</h4>
 						<hr>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
+						<!-- comments -->
+						<?php commentsBlock(); ?>
 						
 					</div>
 				</div>
