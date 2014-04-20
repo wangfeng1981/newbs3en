@@ -61,12 +61,19 @@
 						<hr>
 						<!-- comments -->
 						<?php commentsBlock(); ?>
+						<hr>
+						<!-- leave a comment block -->
+						<?php leaveACommentBlock(); ?>
 						
 					</div>
 				</div>
 			</div>
 		</div>
+		
 	</div>
+
+	<!-- Footer block  -->
+	<?php footerBlock(); ?>
 	  
 	
     <!-- Bootstrap core JavaScript

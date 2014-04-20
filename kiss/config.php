@@ -184,7 +184,10 @@ function template($iactive)
 		array("activity","课程"),
 		array("news","通知"),
 		array("comments","评论"),
-		array("file","文件资源")
+		array("file","文件资源"),
+		array("hr",""),
+		array("help","帮助"),
+		array("about","关于")
 	);
 	?>
     <ul class="nav bs-sidenav nav-pills nav-stacked">
@@ -192,7 +195,10 @@ function template($iactive)
 		<?php 
 			foreach ($pages as $page1){ ?>
 		    <li <?php if(strcmp($subfolder,$page1[0])==0) echo "class='active'"; ?> >
-				<a href="<?php echo $GLOBALS['gSiteRootPath'].$page1[0];?>"><?php echo $page1[1];?></a>
+				<?php if(strcmp($page1[0],"hr")==0) echo "<hr>"; 
+					else { ?>
+					<a href="<?php echo $GLOBALS['gSiteRootPath'].$page1[0];?>"><?php echo $page1[1];?></a>
+				<?php } ?>
 			</li>
 		<?php }	?>
 
@@ -497,7 +503,7 @@ function template($iactive)
 					</li>
 				</ul>
 			<?php } else { /* endif $state==2 */ ?>
-				<form class="navbar-form navbar-right" role="form" action="<?php echo $GLOBALS['gSiteRootPath']."index.php"; ?>" method="post">
+				<form class="navbar-form navbar-right" role="form" action="<?php echo $GLOBALS['gSiteRootPath']."index.php"; ?>" method="post" id="formlogin" name="formlogin" >
 					<div class="form-group">
 						<?php if($state==1) echo "<span class='label label-warning'>学号或密码错误,请重新输入.</span>"; ?>
 						<input type="text" name="stuid" id="stuid" class="form-control" placeholder="请输入学号">
@@ -516,4 +522,30 @@ function template($iactive)
 <?php 
 }
 ?>
+
+
+<?php function footerBlock() { ?>
+	<!-- footer: copyright , date , develope team , etc  -->
+	<footer class="bs-docs-footer" role="contentinfo">
+	  <div class="container">
+	    <p>Designed and built by <a href="http://weibo.com/wangfengirsa" target="_blank">@wangfengirsa</a>. Copyright © 2014 jfwf@yeah.net</p>
+	  </div>
+	</footer>
+<?php } ?>
+
+
+<?php function leaveACommentBlock(){ ?>
+	<!-- 页面底端留言 -->
+	<form role="form" id="formcomment" name="formcomment" action="<?php echo $GLOBALS['gSiteRootPath'].'comments/index.php';?>" method="post">
+		<div class="form-group">
+	  		<textarea class="form-control" rows="3" id="comment" name="comment" placeholder="请输入留言"></textarea>
+		</div>
+		<p><?php if(isset($_SESSION['stuid'])==false) echo "<span class='label label-warning'>请登录后进行留言.</span>" ?></p>
+		<button type="submit" class="btn btn-info" <?php if(isset($_SESSION['stuid'])==false) echo "disabled";?> >提交留言</button>
+	</form>
+
+<?php } ?>
+
+
+
 
