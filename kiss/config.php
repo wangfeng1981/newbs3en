@@ -1,7 +1,5 @@
-﻿
+﻿<?php 
 
-<?php 
-	
 //===============================================
 // Includes
 //===============================================
@@ -12,7 +10,6 @@ require('kissmvc.php');
 // 全局变量
 //===============================================
 $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
-	
 
 //===============================================
 // 数据库
@@ -123,6 +120,7 @@ $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 			$this->rs['url']='';
 			$this->rs['utime']=0;
 			$this->rs['type']='';
+			$this->rs['title']='';
 		}
 	}
 	
@@ -219,6 +217,9 @@ function template($iactive)
 				$les_array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
 				$i=0;
 				$nles=count($les_array);
+				if( $nles == 0 ) {
+					echo "<a class='list-group-item' href='#'><p class='list-group-item-text'><small>课程批次列表为空。</small></p></a>";
+				}
 				foreach( $les_array as $les ) { ?>
 
 				<a class="list-group-item" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?lesserial='.$les->get('serial'); ?>" >
@@ -227,7 +228,7 @@ function template($iactive)
 						<span class="label label-success text-right">剩余<?php 
 							$order = new tabLesorder();
 							$nsel = $order->select("count(stuserial) as nsel","lesserial=?",$les->get('serial'));
-							echo $les->get('maxnum')-$nsel['nsel'];
+							echo $les->get('maxnum')-$nsel[0]['nsel'];
 						?></span>
 					</h5>
 				    <p class="list-group-item-text"><small><?php echo $les->get('desc');?></small></p>
@@ -278,10 +279,13 @@ function template($iactive)
 
 		<?php 
 			$news=new tabNews();
-			$ncnt=$news->select("count(serial) as cnt");
-			$totalNumNews=0+$ncnt['cnt'];
+			$ncnt=$news->select("count(serial) as cnt","serial>0");
+			$totalNumNews=0+$ncnt[0]['cnt'];
 			$startindex=$ipage*$nshow;
 			$npage=ceil($totalNumNews/$nshow);
+			if( $totalNumNews == 0 ) {
+				echo "<div class='jcomment-admin'>通知列表为空。</div>";
+			}
 
 			$selstr="news_table.serial as nserial, news_table.message as nmessage, news_table.utime as nutime, news_table.ontop as nontop, admin_table.adminname as aname, admin_table.photo as aphoto";
 			$frmstr="news_table,admin_table";
@@ -347,10 +351,13 @@ function template($iactive)
 
 		<?php 
 			$cmt=new tabComments();
-			$ncnt=$cmt->select("count(serial) as cnt");
-			$totalNumNews=0+$ncnt['cnt'];
+			$ncnt=$cmt->select("count(serial) as cnt","serial>0");
+			$totalNumComments=0+$ncnt[0]['cnt'];
 			$startindex=$ipage*$nshow;
-			$npage=ceil($totalNumNews/$nshow);
+			$npage=ceil($totalNumComments/$nshow);
+			if( $totalNumComments == 0 ) {
+				echo "<div class='jcomment'>评论列表为空。</div>";
+			}
 
 
 			$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, comments_table.replyserial as creply, student_table.stuname as sname, student_table.photo as sphoto";
@@ -377,9 +384,136 @@ function template($iactive)
 				  </div>
 				</div>
 
-		<?php }	?>
-		<?php if( $ipage==0 && $totalNumNews>$nshow ) { ?>
+		<?php } ?>
+		<?php if( $ipage==0 && $totalNumComments>$nshow ) { ?>
 			<div class="jcomment"><a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">更多... ...</a></div>
-		<?php } /*if( $ipage==0 && $totalNumNews>$nshow )*/ ?>
+		<?php } /*if( $ipage==0 && $totalNumComments>$nshow )*/ ?>
 
 <?php } ?>
+
+
+<?php function filesBlock($nshow=5,$ipage=0) { 
+	//最新文件显示 $ipage is zero based.
+	/*
+	<div class="media">
+	  <a class="pull-left" href="#">
+		<img class="media-object" src="img/pdficon.jpg" alt="pdf"  width="32" height="32">
+	  </a>
+	  <div class="media-body">
+		<h4 class="media-heading">Student Zhao</h4>
+		IGARSS会议报告及行程
+		<p class="jfwfupdate">2014.5.2</p>
+	  </div>
+	  <hr>
+	</div>
+	*/
+		$file=new tabStufile();
+		$ncnt=$file->select("count(serial) as cnt","serial>0");
+		$total=0+$ncnt[0]['cnt'];
+		$startindex=$ipage*$nshow;
+		$npage=ceil($total/$nshow);
+
+		if( $total==0 ) {
+			echo "<div class='media' style='margin-top:5px'>文件列表为空。</div>";
+		}
+
+		$selstr="stufile_table.serial as fserial, stufile_table.url as furl, stufile_table.utime as futime, stufile_table.type as ftype, stufile_table.title as ftitle, student_table.stuname as sname";
+		$frmstr="stufile_table,student_table";
+		$whrstr="stufile_table.stuserial=student_table.serial GROUP BY stufile_table.serial ORDER BY stufile_table.utime DESC LIMIT ".$startindex.",".$nshow ;
+
+			$file = new tabStufile() ;
+			$file_array = $file->select_mt($selstr,$frmstr,$whrstr);
+
+			foreach ($file_array as $file) { 
+				$ext = strtolower(pathinfo($file['furl'], PATHINFO_EXTENSION));
+				$typeicon="img/unknownicon.jpg";
+				if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
+				else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
+				else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
+
+				?>
+
+				<div class="media" style="margin-top:5px">
+				  <a class="pull-left" href="#">
+					<img class="media-object" src="<?php echo $GLOBALS['gSiteRootPath'].$typeicon;?>" alt="pdf"  width="50" height="50">
+				  </a>
+				  <div class="media-body">
+					<h5 class="media-heading"><?php echo $file['sname'];?></h5>
+					<?php echo $file['ftitle'];?>
+					<p class="jfwfupdate"><?php echo edt2sh($file['futime']);?></p>
+				  </div>
+				  <hr style="margin-top:0px;margin-bottom:5px">
+				</div>
+
+		<?php } ?>
+		<?php if( $ipage==0 && $total>$nshow ) { ?>
+			<div class="media"><a href="<?php echo $GLOBALS['gSiteRootPath'].'file/';?>">更多... ...</a></div>
+		<?php } /* endif( $ipage==0 && $total>$nshow )*/ ?>
+
+
+<?php } ?>
+
+
+<?php function topNaviBlock() 
+{ //顶端导航栏
+	$state=0; //0 no session , no post; 1 login bad; 2 login ok or has session.
+	if( isset($_GET['quit']))
+	{
+		unset($_SESSION['stuid']);
+		unset($_SESSION['stuname']);
+		session_destroy();
+	}else
+	{
+		if( isset($_POST['stuid']))
+		{
+			$stu = new tabStudent();
+			if($stu->retrieve_one("stuid=? AND stupass=?",array($_POST['stuid'],$_POST['stupass'])))
+			{
+				$_SESSION['stuid']=$stu->get('stuid');
+				$_SESSION['stuname']=$stu->get('stuname');
+				$state=2 ;
+			}else
+			{
+				$state=1;
+			}
+		}else if( isset($_SESSION['stuid']))
+		{
+			$state=2;
+		}
+	}
+	
+?>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="navbar-header">
+			 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="#">研究生选课小助手</a>
+		</div>
+		
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<?php if($state==2) { ?> 
+				<ul class="nav navbar-nav navbar-right">
+					<li><a><?php echo $_SESSION['stuname'];?>,您好!</a></li>
+					<li>
+						<a href="<?php echo $GLOBALS['gSiteRootPath']."index.php?quit=1"; ?>">退出</a>
+					</li>
+				</ul>
+			<?php } else { /* endif $state==2 */ ?>
+				<form class="navbar-form navbar-right" role="form" action="<?php echo $GLOBALS['gSiteRootPath']."index.php"; ?>" method="post">
+					<div class="form-group">
+						<?php if($state==1) echo "<span class='label label-warning'>学号或密码错误,请重新输入.</span>"; ?>
+						<input type="text" name="stuid" id="stuid" class="form-control" placeholder="请输入学号">
+						<input type="password" name="stupass" id="studpass" class="form-control" placeholder="请输入密码">
+						<div class="checkbox">
+							<label>
+							  <input type="checkbox">记住我
+							</label>
+						</div>
+					</div> <button type="submit" name="submit" id="submit" class="btn btn-primary" value="submit">登录</button>
+				</form>
+			<?php } /* endelse $state==2 */ ?>
+			
+		</div>
+	</nav>
+<?php 
+}
+?>
+
