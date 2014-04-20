@@ -327,7 +327,7 @@ function template($iactive)
 <?php } ?>
 
 
-<?php function commentsBlock($nshow=5,$ipage=0) { 
+<?php function commentsBlock($nshow=5,$ipage=0,$showpager=0) { 
 	//最新评论显示 $ipage is zero based.
 	/*
 	SELECT news_table.message AS msg, admin_table.adminname AS name
@@ -365,7 +365,6 @@ function template($iactive)
 				echo "<div class='jcomment'>评论列表为空。</div>";
 			}
 
-
 			$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, comments_table.replyserial as creply, student_table.stuname as sname, student_table.photo as sphoto";
 			$frmstr="comments_table,student_table";
 			$whrstr="comments_table.bystuserial=student_table.serial GROUP BY comments_table.serial ORDER BY comments_table.utime DESC LIMIT ".$startindex.",".$nshow ;
@@ -391,10 +390,30 @@ function template($iactive)
 				</div>
 
 		<?php } ?>
-		<?php if( $ipage==0 && $totalNumComments>$nshow ) { ?>
+		<?php if( $showpager==0 && $totalNumComments>$nshow ) { ?>
 			<div class="jcomment"><a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">更多... ...</a></div>
-		<?php } /*if( $ipage==0 && $totalNumComments>$nshow )*/ ?>
-
+		<?php }else if($showpager==1){ ?>
+			<ul class="pagination">
+				<li <?php if($ipage<=0) echo "class='disabled'";?>>
+					<a href="<?php if($ipage<=0) echo '#'; else echo $GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.($ipage-1);?>">&laquo;</a>
+				</li>
+				<?php 
+					$ivalid=0;
+					for ($i = $ipage-2; $i < 5+2 ; $i++) {
+						if( $i<0 ) continue ;
+						if( $i==$npage ) break;
+						$ivalid=$ivalid+1;
+						$str1="";
+						if($i==$ipage) $str1="class='active'";
+    					echo "<li ".$str1."><a href='".$GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.$i."'>".($i+1)."</a></li>";
+						if($ivalid==5) break;
+					}
+				?>
+				<li <?php if($ipage>=$npage-1) echo "class='disabled'";?>>
+					<a href="<?php if($ipage>=$npage-1) echo '#';else echo $GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.($ipage+1);?>">&raquo;</a>
+				</li>
+			</ul>
+		<?php } ?>
 <?php } ?>
 
 
@@ -465,6 +484,7 @@ function template($iactive)
 	$state=0; //0 no session , no post; 1 login bad; 2 login ok or has session.
 	if( isset($_GET['quit']))
 	{
+		unset($_SESSION['stuserial']);
 		unset($_SESSION['stuid']);
 		unset($_SESSION['stuname']);
 		session_destroy();
@@ -475,6 +495,7 @@ function template($iactive)
 			$stu = new tabStudent();
 			if($stu->retrieve_one("stuid=? AND stupass=?",array($_POST['stuid'],$_POST['stupass'])))
 			{
+				$_SESSION['stuserial']=$stu->get('serial');
 				$_SESSION['stuid']=$stu->get('stuid');
 				$_SESSION['stuname']=$stu->get('stuname');
 				$state=2 ;
@@ -482,7 +503,7 @@ function template($iactive)
 			{
 				$state=1;
 			}
-		}else if( isset($_SESSION['stuid']))
+		}else if( isset($_SESSION['stuserial']))
 		{
 			$state=2;
 		}
@@ -540,8 +561,8 @@ function template($iactive)
 		<div class="form-group">
 	  		<textarea class="form-control" rows="3" id="comment" name="comment" placeholder="请输入留言"></textarea>
 		</div>
-		<p><?php if(isset($_SESSION['stuid'])==false) echo "<span class='label label-warning'>请登录后进行留言.</span>" ?></p>
-		<button type="submit" class="btn btn-info" <?php if(isset($_SESSION['stuid'])==false) echo "disabled";?> >提交留言</button>
+		<p><?php if(isset($_SESSION['stuserial'])==false) echo "<span class='label label-warning'>请登录后进行留言.</span>" ?></p>
+		<button type="submit" class="btn btn-info" <?php if(isset($_SESSION['stuserial'])==false) echo "disabled";?> >提交留言</button>
 	</form>
 
 <?php } ?>
