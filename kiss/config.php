@@ -119,7 +119,7 @@ $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 			$this->rs['stuserial']=0;
 			$this->rs['url']='';
 			$this->rs['utime']=0;
-			$this->rs['type']='';
+			$this->rs['lesserial']=0;
 			$this->rs['title']='';
 		}
 	}
@@ -205,6 +205,70 @@ function template($iactive)
 	</ul>
 <?php } ?>
 
+
+
+<?php function printOneLesson($lesobj,$showslist) { 
+	$statestr="关闭";
+	if( $lesobj->get('state')==1 )
+		$statestr="开放";
+	$order = new tabLesorder() ;
+	$cnt=$order->select("count(serial) as cnt","lesserial=?",$lesobj->get('serial'));
+	$ncnt=$cnt[0]['cnt'];
+	$nlast=$lesobj->get('maxnum')-$ncnt;
+
+	?>
+	<!-- 课程批次 -->
+	<div class="panel panel-default">
+      <div class="panel-heading">
+        	<strong><?php echo $lesobj->get('title');?></strong>
+        	<span class="label label-primary pull-right"><?php echo $statestr;?></span>
+      </div>
+      <div class="panel-body">
+        <?php echo $lesobj->get('desc'); ?>
+        <p class="jfwfupdate"><?php echo edt2sh($lesobj->get('utime'));?></p>
+      </div>
+      <div class="panel-footer" style="position:relative">
+        <span class="label label-success">剩余<?php echo $nlast;?>人</span>
+        <span class="label label-default">最大<?php echo $lesobj->get('maxnum');?>人</span>
+        <a role="button" class="btn btn-primary btn-sm" style="position:absolute;right:10px;top:5px" <?php if($lesobj->get('state')!=1) echo "disabled='disabled'"; else echo "href='".$GLOBALS['gSiteRootPath']."activity/index.php?addles=".$lesobj->get('serial')."'"; ?>>加入课程</a>
+      </div>
+      <?php if($showslist==1){ 
+      	$order = new tabLesorder() ;
+      	$selstr="student_table.serial as serial1,student_table.stuname as name1,student_table.photo as photo1";
+		$frmstr="student_table,lesorder_table";
+		$whrstr="student_table.serial=lesorder_table.stuserial AND lesorder_table.lesserial=".$lesobj->get('serial')." GROUP BY student_table.serial ORDER BY lesorder_table.utime DESC " ;
+		$array = $order->select_mt($selstr,$frmstr,$whrstr);
+
+      	?>
+	      <!-- List group -->
+	      <ul class="list-group">
+	        <li class="list-group-item" style="background-color: rgb(217, 237, 247);font-weight:bold">已加入<?php echo $ncnt;?>人</li>
+
+	        <?php foreach ($array as $stu1 ) { ?>
+	        	<li class="list-group-item"><img class="jlesstuphoto" src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$stu1['photo1'];?>">
+	        		<?php echo $stu1['name1'];
+	        			$file1=new tabStufile();
+	        			$file1->retrieve_one("stuserial=? AND lesserial=?",array($stu1['serial1'],$lesobj->get('serial')));
+	        			if( $file1->exists() )
+	        			{
+	        				$ext = strtolower(pathinfo($file1->get('url'), PATHINFO_EXTENSION));
+							$typeicon="img/unknownicon.jpg";
+							if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
+							else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
+							else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
+							echo "<img class='jlesfileicon' src='".$GLOBALS['gSiteRootPath'].$typeicon."'>";
+	        			}
+	        		?>
+	        	</li>
+	        <?php } ?>
+
+	      </ul>
+	  <?php } ?>
+    </div>
+
+<?php } ?>
+
+
 <?php function activityBlock($nshow=1) { 
 	//课程分类及相关批次课程摘要显示
 	?>
@@ -214,40 +278,35 @@ function template($iactive)
 			$act_array = $act->retrieve_many("serial>0 ORDER BY utime DESC");
 			foreach ($act_array as $act) { ?>
 
-			<a class="list-group-item active2" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
-				<h4 class="list-group-item-heading"><strong><?php echo $act->get('title');?></strong></h4>
-			</a>
+			<div class="panel panel-primary" style="border-width:2px">
+			  <!-- Default panel contents -->
+			  <div class="panel-heading">
+			  	<h4><a style="color:white;display:block" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
+			  		<strong><?php echo $act->get('title');?></strong>
+			  	</a></h4>
+			  </div>
+			  <div class="panel-body">
+					<?php 
+						$les = new tabLesson();
+						$les_array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
+						$i=0;
+						$nles=count($les_array);
+						if( $nles == 0 ) {
+							echo "<a class='list-group-item' href='#'><p class='list-group-item-text'><small>课程批次列表为空。</small></p></a>";
+						}
+						foreach( $les_array as $les ) { 
+							printOneLesson($les,1);
+							?>					
+						<?php $i=$i+1 ; if($i>=$nshow) break ; ?>
 
-			<?php 
-				$les = new tabLesson();
-				$les_array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
-				$i=0;
-				$nles=count($les_array);
-				if( $nles == 0 ) {
-					echo "<a class='list-group-item' href='#'><p class='list-group-item-text'><small>课程批次列表为空。</small></p></a>";
-				}
-				foreach( $les_array as $les ) { ?>
-
-				<a class="list-group-item" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?lesserial='.$les->get('serial'); ?>" >
-					<h5 class="list-group-item-heading">
-						<?php echo $les->get('title');?>
-						<span class="label label-success text-right">剩余<?php 
-							$order = new tabLesorder();
-							$nsel = $order->select("count(stuserial) as nsel","lesserial=?",$les->get('serial'));
-							echo $les->get('maxnum')-$nsel[0]['nsel'];
-						?></span>
-					</h5>
-				    <p class="list-group-item-text"><small><?php echo $les->get('desc');?></small></p>
-
-				</a>
-				<?php $i=$i+1 ; if($i>=$nshow) break ; ?>
-
-			<?php }	?>
-			<?php if( $nshow<$nles ) { ?>
-				<a class="list-group-item" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
-					<p class="list-group-item-text"><small>更多...</small></p>
-				</a>
-			<?php } ?>
+					<?php }	?>
+					<?php if( $nshow<$nles ) { ?>
+						<a class="list-group-item" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
+							<p class="list-group-item-text"><small>更多...</small></p>
+						</a>
+					<?php } ?>
+				</div>
+			</div>
 			<hr>
 
 		<?php }	?>
@@ -512,7 +571,13 @@ function template($iactive)
 ?>
 	<nav class="navbar navbar-default" role="navigation">
 		<div class="navbar-header">
-			 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="#">研究生选课小助手</a>
+			 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> 
+			 	<span class="sr-only">Toggle navigation</span>
+			 	<span class="icon-bar"></span>
+			 	<span class="icon-bar"></span>
+			 	<span class="icon-bar"></span>
+			 </button> 
+			 <a class="navbar-brand" href="<?php echo $GLOBALS['gSiteRootPath'];?>">研究生选课小助手</a>
 		</div>
 		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -566,6 +631,10 @@ function template($iactive)
 	</form>
 
 <?php } ?>
+
+
+
+
 
 
 
