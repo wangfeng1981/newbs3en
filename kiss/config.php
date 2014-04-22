@@ -14,6 +14,7 @@ $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 //===============================================
 // 数据库
 //===============================================
+
 	//=====================================================
 	class tabActivity extends Model
 	{
@@ -206,8 +207,12 @@ function template($iactive)
 <?php } ?>
 
 
-
-<?php function printOneLesson($lesobj,$showslist) { 
+<?php function printOneLesson($lesobj,$displayMode=1) { 
+	/*
+	displayMode=1 only title, state and available num.
+	displayMode=2 detail info without namelist.
+	displayMode=3 detail info with namelist.
+	*/
 	$statestr="关闭";
 	if( $lesobj->get('state')==1 )
 		$statestr="开放";
@@ -218,101 +223,187 @@ function template($iactive)
 
 	?>
 	<!-- 课程批次 -->
-	<div class="panel panel-default">
-      <div class="panel-heading">
-        	<strong><?php echo $lesobj->get('title');?></strong>
-        	<span class="label label-primary pull-right"><?php echo $statestr;?></span>
-      </div>
-      <div class="panel-body">
-        <?php echo $lesobj->get('desc'); ?>
-        <p class="jfwfupdate"><?php echo edt2sh($lesobj->get('utime'));?></p>
-      </div>
-      <div class="panel-footer" style="position:relative">
-        <span class="label label-success">剩余<?php echo $nlast;?>人</span>
-        <span class="label label-default">最大<?php echo $lesobj->get('maxnum');?>人</span>
-        <a role="button" class="btn btn-primary btn-sm" style="position:absolute;right:10px;top:5px" <?php if($lesobj->get('state')!=1) echo "disabled='disabled'"; else echo "href='".$GLOBALS['gSiteRootPath']."activity/index.php?addles=".$lesobj->get('serial')."'"; ?>>加入课程</a>
-      </div>
-      <?php if($showslist==1){ 
-      	$order = new tabLesorder() ;
-      	$selstr="student_table.serial as serial1,student_table.stuname as name1,student_table.photo as photo1";
-		$frmstr="student_table,lesorder_table";
-		$whrstr="student_table.serial=lesorder_table.stuserial AND lesorder_table.lesserial=".$lesobj->get('serial')." GROUP BY student_table.serial ORDER BY lesorder_table.utime DESC " ;
-		$array = $order->select_mt($selstr,$frmstr,$whrstr);
 
-      	?>
-	      <!-- List group -->
-	      <ul class="list-group">
-	        <li class="list-group-item" style="background-color: rgb(217, 237, 247);font-weight:bold">已加入<?php echo $ncnt;?>人</li>
-
-	        <?php foreach ($array as $stu1 ) { ?>
-	        	<li class="list-group-item"><img class="jlesstuphoto" src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$stu1['photo1'];?>">
-	        		<?php echo $stu1['name1'];
-	        			$file1=new tabStufile();
-	        			$file1->retrieve_one("stuserial=? AND lesserial=?",array($stu1['serial1'],$lesobj->get('serial')));
-	        			if( $file1->exists() )
-	        			{
-	        				$ext = strtolower(pathinfo($file1->get('url'), PATHINFO_EXTENSION));
-							$typeicon="img/unknownicon.jpg";
-							if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
-							else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
-							else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
-							echo "<img class='jlesfileicon' src='".$GLOBALS['gSiteRootPath'].$typeicon."'>";
-	        			}
-	        		?>
-	        	</li>
-	        <?php } ?>
-
-	      </ul>
-	  <?php } ?>
-    </div>
-
-<?php } ?>
-
-
-<?php function activityBlock($nshow=1) { 
-	//课程分类及相关批次课程摘要显示
+	<?php 
+	if($displayMode==1)
+	{
+		echo "<a href='".$GLOBALS['gSiteRootPath']."activity/index.php?les=".$lesobj->get('serial')."' class='list-group-item'>";
+		echo "<strong>".$lesobj->get('title')."</strong>";
+		if($lesobj->get('state')==1) echo "<span class='label label-info pull-right'>开放</span>";
+		else echo "<span class='label label-warning pull-right'>关闭</span>";
+		echo "<span class='label label-success pull-right'>剩余".$nlast."人</span>";
+		echo "<p>".$lesobj->get('desc')."</p>";
+		echo "</a>";
+	}
+	else if($displayMode>1) { 
 	?>
-    <div class="list-group">
-		<?php 
-			$act = new tabActivity();
-			$act_array = $act->retrieve_many("serial>0 ORDER BY utime DESC");
-			foreach ($act_array as $act) { ?>
+		<div class="panel panel-default">
+	      <div class="panel-heading">
+	        <a href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?les='.$lesobj->get('serial');?>" style="color:black;display:block;text-decoration:none">
+	        	<strong>
+	        		<?php echo $lesobj->get('title');?>
+	        	</strong>
+	        	<span class="label label-<?php if($lesobj->get('state')==1) echo 'info';else echo 'warning';?> pull-right">
+	        		<?php echo $statestr;?>
+	        	</span>
+	        </a>
+	      </div>
+	      <div class="panel-body">
+	        <?php echo $lesobj->get('desc'); ?>
+	        <p class="jfwfupdate"><?php echo edt2sh($lesobj->get('utime'));?></p>
+	      </div>
+	      <div class="panel-footer" style="position:relative">
+	        <span class="label label-success">剩余<?php echo $nlast;?>人</span>
+	        <span class="label label-default">最多<?php echo $lesobj->get('maxnum');?>人</span>
+	        <a role="button" class="btn btn-primary btn-sm" style="position:absolute;right:10px;top:5px" <?php if($lesobj->get('state')!=1||isset($_SESSION['stuserial'])==false) echo "disabled='disabled'"; else echo "href='".$GLOBALS['gSiteRootPath']."activity/index.php?join=".$lesobj->get('serial')."'";?>>
+	        	加入课程</a>
+	      </div>
+	      <?php if($displayMode>2){ 
+	      	$order = new tabLesorder() ;
+	      	$selstr="student_table.serial as serial1,student_table.stuname as name1,student_table.photo as photo1";
+			$frmstr="student_table,lesorder_table";
+			$whrstr="student_table.serial=lesorder_table.stuserial AND lesorder_table.lesserial=".$lesobj->get('serial')." GROUP BY student_table.serial ORDER BY lesorder_table.utime DESC " ;
+			$array = $order->select_mt($selstr,$frmstr,$whrstr);
 
-			<div class="panel panel-primary" style="border-width:2px">
-			  <!-- Default panel contents -->
-			  <div class="panel-heading">
-			  	<h4><a style="color:white;display:block" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
-			  		<strong><?php echo $act->get('title');?></strong>
-			  	</a></h4>
-			  </div>
-			  <div class="panel-body">
-					<?php 
-						$les = new tabLesson();
-						$les_array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
-						$i=0;
-						$nles=count($les_array);
-						if( $nles == 0 ) {
-							echo "<a class='list-group-item' href='#'><p class='list-group-item-text'><small>课程批次列表为空。</small></p></a>";
-						}
-						foreach( $les_array as $les ) { 
-							printOneLesson($les,1);
-							?>					
-						<?php $i=$i+1 ; if($i>=$nshow) break ; ?>
+	      	?>
+		      <!-- List group -->
+		      <ul class="list-group">
+		        <li class="list-group-item" style="background-color: rgb(217, 237, 247);font-weight:bold">已加入<?php echo $ncnt;?>人</li>
 
-					<?php }	?>
-					<?php if( $nshow<$nles ) { ?>
-						<a class="list-group-item" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?actserial='.$act->get('serial'); ?>" >
-							<p class="list-group-item-text"><small>更多...</small></p>
-						</a>
-					<?php } ?>
-				</div>
-			</div>
-			<hr>
+		        <?php foreach ($array as $stu1 ) { ?>
+		        	<li class="list-group-item"><img class="jlesstuphoto" width="32" height="32" src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$stu1['photo1'];?>">
+		        		<?php echo $stu1['name1'];
+		        			$file1=new tabStufile();
+		        			$file1->retrieve_one("stuserial=? AND lesserial=?",array($stu1['serial1'],$lesobj->get('serial')));
+		        			if( $file1->exists() )
+		        			{
+		        				$ext = strtolower(pathinfo($file1->get('url'), PATHINFO_EXTENSION));
+								$typeicon="img/unknownicon.jpg";
+								if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
+								else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
+								else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
+								echo "<img class='jlesfileicon' src='".$GLOBALS['gSiteRootPath'].$typeicon."'>";
+		        			}
+		        		?>
+		        	</li>
+		        <?php } ?>
 
-		<?php }	?>
+		      </ul>
+		  <?php }/*endif $displayMode>2 */ ?>
 
-	</div>
+	    </div>
+    <?php }/* dm > 1*/ ?>
 <?php } ?>
+
+
+<?php function activityBlock($displayMode=1,$actserial=0,$lesserial=0) { 
+	//课程分类及相关批次课程摘要显示
+	//displayMode=1 for index.php; 
+	//displayMode=2 for activity/index.php;
+	//displayMode=3 for activity/index.php?act=xxx ;
+	//displayMode=4 for activity/index.php?les=xxx ;
+	?>
+	<?php 
+		if($displayMode==1) 
+		{ 
+			$les=new tabLesson();
+			$array = $les->retrieve_many("serial>0 ORDER BY utime DESC LIMIT 0,6");
+			foreach ($array as $les){
+				printOneLesson($les,2) ;
+			}
+			if(count($array)>5) echo "<p><a href='".$GLOBALS['gSiteRootPath']+"activity/'>更多课程...</a></p>";
+		}/* endif displayMode==1 */ 
+		else if($displayMode==2){
+			$act=new tabActivity();
+			$array=$act->retrieve_many("serial>0 ORDER BY utime DESC");
+			/*horizonal activities link*/
+			echo "<ol class='jh-breadcrumb'>";
+			foreach ($array as $act) {
+				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/index.php?act=".$act->get('serial')."''>";
+				echo $act->get('title')."</a></li>";		
+			}
+			echo "</ol>";
+
+			foreach ($array as $act) { 
+	?>
+				<div class="panel panel-default" style="border-width:2px">
+				  <!-- Default panel contents -->
+				  <div class="panel-heading">
+				  	<a style="display:block;text-decoration:none" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?act='.$act->get('serial'); ?>" >
+				  		<strong><?php echo $act->get('title');?></strong>
+				  	</a>
+				  </div>
+				  <div class="panel-body">
+				  	<?php 
+				  		echo "<p>".$act->get('desc')."</p>";
+				  		echo "<p class='jfwfupdate'>".edt2sh($act->get('utime'))."</p>";
+				  	?>
+				  </div>
+				  <div class="list-group">
+				  	<?php 
+				  		$les = new tabLesson();
+						$array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
+						if( count($array)==0 )
+						{
+							echo "<a class='list-group-item'><p class='list-group-item-text'>课程批次列表为空。</p></a>";
+						}else
+						{
+							foreach ($array as $les ) {
+								printOneLesson($les,1);
+							}
+						}
+				  	?>
+				  </div>
+				</div>
+			<?php } /* end foreach $array as $act */ ?>
+	<?php } /*end elseif displayMode==2 */ 
+	else if($displayMode==3) { ?>
+		<?php 
+			
+			/*horizonal navi link*/
+			$act=new tabActivity();
+			$act->retrieve($actserial);
+			if($act->exists())
+			{
+				echo "<ol class='breadcrumb'>";
+				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/'>".全部课程."</a></li>";
+				echo "<li>".$act->get('title')."</li>";
+				echo "</ol>";
+			}
+			
+			$les=new tabLesson();
+			$array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$actserial);
+			foreach ($array as $les){
+				printOneLesson($les,2) ;
+			}
+		?>
+	<?php } /*end elseif displayMode==3 */  
+	else if($displayMode==4) { ?>
+		<?php 
+			/*horizonal navi link*/
+			$les0=new tabLesson();
+			$whrstr="lesson_table.serial=".$lesserial." AND lesson_table.actserial=activity_table.serial";
+			$selarray=$les0->select_mt("activity_table.serial as actserial, activity_table.title as acttitle, lesson_table.title as ltitle","activity_table,lesson_table",$whrstr);
+			if($selarray)
+			{
+				echo "<ol class='breadcrumb'>";
+				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/'>".全部课程."</a></li>";
+				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/index.php?act=".$selarray[0]['actserial']."''>".$selarray[0]['acttitle']."</a></li>";
+				echo "<li>".$selarray[0]['ltitle']."</li>";
+				echo "</ol>";
+			}
+
+			$les=new tabLesson();
+			$les->retrieve($lesserial);
+			if($les->exists())
+			{
+				printOneLesson($les,3) ;
+			}
+		?>
+	<?php } /*end elseif displayMode==4 */  ?>
+<?php } ?>
+
+
 
 <?php function newsBlock($nshow=5,$ipage=0) { 
 	//最新通知显示 $ipage is zero based.
@@ -501,7 +592,7 @@ function template($iactive)
 			echo "<div class='media' style='margin-top:5px'>文件列表为空。</div>";
 		}
 
-		$selstr="stufile_table.serial as fserial, stufile_table.url as furl, stufile_table.utime as futime, stufile_table.type as ftype, stufile_table.title as ftitle, student_table.stuname as sname";
+		$selstr="stufile_table.serial as fserial, stufile_table.url as furl, stufile_table.utime as futime, stufile_table.lesserial as flserial, stufile_table.title as ftitle, student_table.stuname as sname";
 		$frmstr="stufile_table,student_table";
 		$whrstr="stufile_table.stuserial=student_table.serial GROUP BY stufile_table.serial ORDER BY stufile_table.utime DESC LIMIT ".$startindex.",".$nshow ;
 
@@ -519,7 +610,7 @@ function template($iactive)
 
 				<div class="media" style="margin-top:5px">
 				  <a class="pull-left" href="#">
-					<img class="media-object" src="<?php echo $GLOBALS['gSiteRootPath'].$typeicon;?>" alt="pdf"  width="50" height="50">
+					<img class="media-object" src="<?php echo $GLOBALS['gSiteRootPath'].$typeicon;?>" alt="pdf"  width="32" height="32">
 				  </a>
 				  <div class="media-body">
 					<h5 class="media-heading"><?php echo $file['sname'];?></h5>
@@ -592,11 +683,11 @@ function template($iactive)
 				<form class="navbar-form navbar-right" role="form" action="<?php echo $GLOBALS['gSiteRootPath']."index.php"; ?>" method="post" id="formlogin" name="formlogin" >
 					<div class="form-group">
 						<?php if($state==1) echo "<span class='label label-warning'>学号或密码错误,请重新输入.</span>"; ?>
-						<input type="text" name="stuid" id="stuid" class="form-control" placeholder="请输入学号">
+						<input type="text" name="stuid" id="stuid" class="form-control" placeholder="请输入学号" <?php if(isset($_COOKIE["rememberme"])) echo "value='".$_COOKIE["rememberme"]."'";?>>
 						<input type="password" name="stupass" id="studpass" class="form-control" placeholder="请输入密码">
 						<div class="checkbox">
 							<label>
-							  <input type="checkbox">记住我
+							  <input type="checkbox" name="rememberme" id="rememberme" value="yes">记住我
 							</label>
 						</div>
 					</div> <button type="submit" name="submit" id="submit" class="btn btn-primary" value="submit">登录</button>
@@ -605,9 +696,7 @@ function template($iactive)
 			
 		</div>
 	</nav>
-<?php 
-}
-?>
+<?php } ?>
 
 
 <?php function footerBlock() { ?>

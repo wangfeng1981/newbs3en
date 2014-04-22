@@ -1,5 +1,12 @@
 ﻿<?php session_start(); ?>
 <?php require('kiss/config.php'); ?>
+<?php if(isset($_POST['rememberme']) ){
+	if(strcmp($_POST['rememberme'],'yes')==0)
+		setcookie("rememberme", $_POST['stuid'], time()+3600*24*7);
+	else
+		setcookie("rememberme", "", time()-3600);
+}
+?>
 
 <!DOCTYPE html>
 <html lang="zh-cn">
@@ -39,11 +46,13 @@
 					  	</div>
 					</div>
 					<div class="col-md-6 column">
+						<h4><strong>最新课程</strong></h4>
+						<hr>
 						<!-- 课程分类列表 -->
-						<?php activityBlock(1); ?>
+						<?php activityBlock(1,0,0); ?>
 
 						<hr>
-						<h4>最新文件资源</h4>
+						<h4><strong>最新文件资源</strong></h4>
 						<hr>
 						<!-- 文件列表 -->
 						<?php filesBlock(5); ?>
