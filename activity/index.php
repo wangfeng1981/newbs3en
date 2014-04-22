@@ -1,11 +1,5 @@
 ﻿<?php session_start(); ?>
 <?php require('../kiss/config.php'); ?>
-<?php 
-	if(isset($_GET['join']) )
-	{
-
-	}
-?>
 
 <!DOCTYPE html>
 <html lang="zh-cn">
@@ -45,11 +39,56 @@
 					  	</div>
 					</div>
 					<div class="col-md-8 column">
+						<?php
+							if(isset($_GET['join']))
+							{//want to join the lesson.
+								$les=new tabLesson();
+								$les->retrieve($_GET['join']) ;
+								if($les->exists())
+								{
+									if($les->currentNumber()>=$les->get('maxnum'))
+									{//lesson reach maxnum, can't join.
+										jAlertBlock("alert-warning","警告!","本次课程已达最大人数,您无法加入.");
+									}else
+									{
+										if(isset($_SESSION['stuserial']))
+										{//do logined.
+											$ord=new tabLesorder();
+											$ord->retrieve_one("lesserial=? AND stuserial=?",array($_GET['join'],$_SESSION['stuserial']));
+											if($ord->get('serial')>0)
+											{//has joint the same lesson yet.
+												jAlertBlock("alert-warning","警告!","您已加入本次课程,请不要重复加入.");
+											}else
+											{//hasn't joint this lesson.
+												$ord=new tabLesorder();
+												$ord->set('lesserial',$_GET['join']);
+												$ord->set('stuserial',$_SESSION['stuserial']);
+												$ord->set('utime',time());
+												$ord->create();
+												$newserial=$ord->get('serial');
+												if($newserial>0)
+												{// join successfully.
+													jAlertBlock("alert-success","OK!","您已成功加入到本次课程.");
+												}else
+												{// something wrong with lesserial or stuserial or bugs.
+													jAlertBlock("alert-danger","错误!","选课过程中出现错误,可能是学号或课程编号无效.请重新登录后再试,或给联系管理员帮忙解决.");
+												}
+											}
+										}else
+										{// not logined.
+											jAlertBlock("alert-danger","错误!","请登录后再进行相关操作.");
+										}
+									}
+								}
+							}
+						?>
 						<?php 
-
 							if(isset($_GET['les']))
 							{
 								activityBlock(4,0,$_GET['les']);
+							}else if(isset($_GET['join'])) 
+							{
+								activityBlock(4,0,$_GET['join']);
 							}else if(isset($_GET['act']))
 							{
 								activityBlock(3,$_GET['act'],0);

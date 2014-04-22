@@ -82,6 +82,12 @@ $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 			$this->rs['thumb']='';
 			$this->rs['largeimage']='';
 		}
+		function currentNumber()
+		{
+			$ord=new tabLesorder();
+			$cnt=$ord->select("count(serial) as cnt","lesserial=?",$this->get('serial'));
+			return $cnt[0]['cnt'];
+		}
 	}
 	//=====================================================
 	class tabNews extends Model
@@ -721,6 +727,14 @@ function template($iactive)
 
 <?php } ?>
 
+
+<?php function jAlertBlock($atype="alert-warning",$atitle="title",$amsg="This is alert!"){ ?>
+	<!-- 警告提示 -->
+	<div class="alert <?php echo $atype;?> alert-dismissable">
+	  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+	  <strong><?php echo $atitle;?></strong> <?php echo $amsg;?>
+	</div>
+<?php } ?>
 
 
 

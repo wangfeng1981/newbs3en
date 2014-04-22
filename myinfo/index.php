@@ -1,6 +1,7 @@
 ﻿<?php session_start(); ?>
 <?php require('../kiss/config.php'); ?>
 
+
 <!DOCTYPE html>
 <html lang="zh-cn">
   <head>
@@ -13,20 +14,14 @@
     <title>我的信息</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../css/bootstrap.css" rel="stylesheet">
 	<link href="../css/jfwfdocs.min.css" rel="stylesheet">
+    <link href="../css/bootstrap.css" rel="stylesheet">
+	
 
     <!-- Custom styles for this template -->
 	<link href="../css/jfwf.css" rel="stylesheet">
 
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="http://cdn.bootcss.com/html5shiv/3.7.0/html5shiv.min.js"></script>
-      <script src="http://cdn.bootcss.com/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
+    
   </head>
 
   <body>
@@ -34,177 +29,104 @@
 	<div class="container">
 		<div class="row clearfix">
 			<div class="col-md-12 column">
-				<nav class="navbar navbar-default" role="navigation">
-					<div class="navbar-header">
-						 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="#">研究生选课小助手</a>
-					</div>
-					
-					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-						<form class="navbar-form navbar-right" role="form">
-							<div class="form-group">
-								<input type="text" class="form-control" placeholder="请输入学号">
-								<input type="password" class="form-control" placeholder="请输入密码">
-								<div class="checkbox">
-									<label>
-									  <input type="checkbox">记住我
-									</label>
-								</div>
-							</div> <button type="submit" class="btn btn-primary">登录</button>
-						</form>
-						<ul class="nav navbar-nav navbar-right">
-							<li>
-								<a href="#">退出</a>
-							</li>
-						</ul>
-					</div>
-					
-				</nav>
+				<!-- top navigation bar -->
+				<?php topNaviBlock(); ?>
+
 				<div class="row clearfix">
 					<div class="col-md-2 column ">
 						<div class="bs-sidebar hidden-print affix" role="complementary">
 						  <!-- side navigation -->
-						  <?php sideNavigationBlock("myinfo");?>
-					  </div>
+						  <?php sideNavigationBlock("myinfo"); ?>
+					  	</div>
 					</div>
-					<div class="col-md-6 column">
-						<div class="list-group">
-							<div class="list-group-item-first">
-								<h3>博士学术论坛</h3>
-							</div>
-							<a href="#" class="list-group-item" >
-								<h4 class="list-group-item-heading">
-									2014年第一期
-								</h4>
-								<p class="list-group-item-text">
-									2014年5月1日 奥运园区A501.
-								</p>
-								<span class="label label-success">剩余14</span>
-								<p class="jfwfupdate">2014.4.25</p>
-							</a>
-						</div>
-						<div class="list-group">
-							<div class="list-group-item-first">
-								<h3>开题</h3>
-							</div>
-							<a href="#" class="list-group-item" >
-								<h4 class="list-group-item-heading">
-									2014年第一期
-								</h4>
-								<p class="list-group-item-text">
-									2014年春季开题的同学请加入该批次.
-								</p>
-								<span class="label label-success">剩余14</span>
-								<p class="jfwfupdate">2014.5.25</p>
-							</a>
-						</div>
-						
-						
+					<div class="col-md-8 column">
+						<!-- my info -->
+						<h4>我的个人信息</h4>
+						<?php
+							$stu=new tabStudent();
+							if(isset($_SESSION['stuserial']))
+							{
+								$stu->retrieve($_SESSION['stuserial']);
+								if($stu->exists())
+								{
+
+								}else
+								{
+									jAlertBlock("alert-danger","错误!","学号无效,请稍后重新登录再试.");
+								}
+							}else {
+								jAlertBlock("alert-warning","警告!","请先登录,然后查看个人信息.");
+							} 
+						?>
+						<table class="table table-striped table-hover">
+							<thead>
+								<tr><th>#</th><th>字段</th><th>值</th><th>操作</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>1</td><td>学号</td><td><?php echo $stu->get('stuid');?></td><td>修改</td></tr>
+								<tr><td>2</td><td>密码</td><td>*********</td><td>修改</td></tr>
+								<tr><td>3</td><td>姓名</td><td><?php echo $stu->get('stuname');?></td><td>修改</td></tr>
+								<tr><td>4</td><td>头像</td><td><img width="50" height="50" src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$stu->get('photo');?>"></td><td>修改</td></tr>
+							</tbody>
+						</table>
 						<hr>
-						<h3>最新PPT(5)</h3>
+
+						<!-- my lesson orders -->
+						<h4>我的课程</h4>
+						<table class="table table-striped table-hover">
+						  <thead>
+								<tr><th>#</th><th>课程</th><th>期次</th><th>加入时间</th><th>文件(冒泡提示文件标题)</th><th>操作</th></tr>
+							</thead>
+							<tbody>
+								<?php 
+									$ord=new tabLesorder();
+									$array=$ord->retrieve_many("stuserial=? ORDER BY utime DESC",$_SESSION['stuserial']);
+									$i=1;
+									foreach ($array as $ord) { ?>
+									<tr><td><?php echo $i;$i=$i+1;?></td><td>?</td><td><?php echo $ord->get('lesserial');?></td><td><?php echo edt2sh($ord->get('utime'));?></td><td>?</td><td>退出</td></tr>
+								<?php } ?>
+								
+							</tbody>
+						</table>
 						<hr>
-						<div class="media">
-						  <a class="pull-left" href="#">
-							<img class="media-object" src="img/ppticon.jpg" alt="ppt" width="32" height="32">
-						  </a>
-						  <div class="media-body">
-							<h4 class="media-heading">Student Mi</h4>
-							遥感XXX研究进展
-							<p class="jfwfupdate">2014.5.2</p>
-						  </div>
-						  <hr>
-						</div>
-						<div class="media">
-						  <a class="pull-left" href="#">
-							<img class="media-object" src="img/pptxicon.jpg" alt="pptx"  width="32" height="32">
-						  </a>
-						  <div class="media-body">
-							<h4 class="media-heading">Student Li</h4>
-							IGARSS会议报告及行程
-							<p class="jfwfupdate">2014.5.2</p>
-						  </div>
-						  <hr>
-						</div>		
-						<div class="media">
-						  <a class="pull-left" href="#">
-							<img class="media-object" src="img/pdficon.jpg" alt="pdf"  width="32" height="32">
-						  </a>
-						  <div class="media-body">
-							<h4 class="media-heading">Student Zhao</h4>
-							IGARSS会议报告及行程
-							<p class="jfwfupdate">2014.5.2</p>
-						  </div>
-						  <hr>
-						</div>
-						
-					</div>
-					<div class="col-md-4 column">
-						<h3>最新通知(5)</h3>
+
+						<!-- my messages -->
+						<h4>我的留言</h4>
+						<table class="table table-striped table-hover">
+						  <thead>
+								<tr><th>#</th><th>留言</th><th>时间</th><th width="50">操作</th></tr>
+							</thead>
+							<tbody>
+								<?php 
+									$cmt=new tabComments();
+									$array=$cmt->retrieve_many("bystuserial=? ORDER BY utime DESC",$_SESSION['stuserial']);
+									$i=1;
+									foreach ($array as $cmt) { ?>
+									<tr><td><?php echo $i;$i=$i+1;?></td><td><?php echo $cmt->get('message');?></td><td><?php echo edt2sh($cmt->get('utime'));?></td><td>删除</td></tr>
+								<?php } ?>
+								
+							</tbody>
+						</table>
 						<hr>
-						<div class="bs-callout bs-callout-warning">
-							<h4>Teacher Yang</h4>
-							<p>这是置顶通知，请详细阅读。。。。。。</p>
-							<p class="jfwfupdate">2014.4.1</p>
-						</div>
-						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Yang</h4>
-							<p>这是普通通知，请详细阅读。。。。。。</p>
-							<p class="jfwfupdate">2014.5.1</p>
-						</div>
-						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Wang</h4>
-							<p>通知2... ... ... ...。</p>
-							<p class="jfwfupdate">2014.4.20</p>
-						</div>
-						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Yang</h4>
-							<p>通知3... ... ... ...。</p>
-							<p class="jfwfupdate">2014.4.15</p>
-						</div>
-						<div class="bs-callout bs-callout-info">
-							<h4>Teacher Yang</h4>
-							<p>通知4... ... ... ...。</p>
-							<p class="jfwfupdate">2014.4.10</p>
-						</div>
-						<hr>
-						<h3>最新留言(5)</h3>
-						<hr>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
-						<div class="bs-callout bs-callout-student">
-							<h4>Student ABC</h4>
-							<p>这是我的留言。</p>
-							<p class="jfwfupdate">2014.5.2</p>
-						</div>
+						<!-- leave a comment block -->
+						<?php leaveACommentBlock(); ?>
 						
 					</div>
+
 				</div>
 			</div>
 		</div>
+		
 	</div>
+
+	<!-- Footer block  -->
+	<?php footerBlock(); ?>
 	  
 	
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
   </body>
 </html>
