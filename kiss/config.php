@@ -709,7 +709,7 @@ function template($iactive)
 	<!-- footer: copyright , date , develope team , etc  -->
 	<footer class="bs-docs-footer" role="contentinfo">
 	  <div class="container">
-	    <p>Designed and built by <a href="http://weibo.com/wangfengirsa" target="_blank">@wangfengirsa</a>. Copyright © 2014 jfwf@yeah.net</p>
+	    <p>Designed and built by <a id="weibome" data-toggle="tooltip" data-placement="top" title="关注我" href="http://weibo.com/wangfengirsa" target="_blank">@wangfengirsa</a>. Copyright © 2014 jfwf@yeah.net</p>
 	  </div>
 	</footer>
 <?php } ?>
@@ -779,6 +779,18 @@ function template($iactive)
 	  return false;
 	}
 	return true;
+}
+?>
+
+<?php function fileIconImgTagBlock($fileurl,$filetitle="",$atagid=""){
+	$ext = strtolower(pathinfo($fileurl, PATHINFO_EXTENSION));
+	$typeicon="img/unknownicon.jpg";
+	if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
+	else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
+	else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
+	echo "<a id='".$atagid."' target='_blank' href='".$fileurl."' data-toggle='tooltip' data-placement='bottom' title='".$filetitle."''>";
+	echo "<img class='jlesfileicon2' src='".$GLOBALS['gSiteRootPath'].$typeicon."'>";
+	echo "</a>";
 }
 ?>
 

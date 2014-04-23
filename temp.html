@@ -1,35 +1,44 @@
-<form class="form-horizontal" id="formcpwd" action="" method="post">
-
+<form class="form-horizontal">
+	<fieldset>
 	<!-- Password input-->
-	<div class="control-group">
-	  <label class="control-label" for="pass0"></label>
-	  <div class="controls">
-	    <input id="pass0" name="pass0" type="password" placeholder="旧密码" class="input-large" required="">
+	<div class="form-group">
+	  <label class="col-md-4 control-label" for="pass0">旧密码</label>
+	  <div class="col-md-4">
+	    <input id="pass0" name="pass0" type="password" placeholder="" class="form-control input-md" required="">
+	    
 	  </div>
 	</div>
 
 	<!-- Password input-->
-	<div class="control-group">
-	  <label class="control-label" for="pass1"></label>
-	  <div class="controls">
-	    <input id="pass1" name="pass1" type="password" placeholder="新密码" class="input-large" required="">
+	<div class="form-group">
+	  <label class="col-md-4 control-label" for="pass1">新密码</label>
+	  <div class="col-md-4">
+	    <input id="pass1" name="pass1" type="password" placeholder="" class="form-control input-md" required="">
+	    
 	  </div>
 	</div>
 
 	<!-- Password input-->
-	<div class="control-group">
-	  <label class="control-label" for="pass2"></label>
-	  <div class="controls">
-	    <input id="pass2" name="pass2" type="password" placeholder="再次输入新密码" class="input-large" required="">
+	<div class="form-group">
+	  <label class="col-md-4 control-label" for="pass2">确认新密码</label>
+	  <div class="col-md-4">
+	    <input id="pass2" name="pass2" type="password" placeholder="" class="form-control input-md" required="">
+	    
 	  </div>
 	</div>
 
 	<!-- Button -->
-	<div class="control-group">
-	  <label class="control-label" for="submit"></label>
-	  <div class="controls">
+	<div class="form-group">
+	  <label class="col-md-4 control-label" for="submit"></label>
+	  <div class="col-md-4">
 	    <button id="submit" name="submit" class="btn btn-success">确认修改</button>
 	  </div>
 	</div>
 
+	</fieldset>
 </form>
+
+<!--
+"SELECT lesorder_table.serial, lesson_table.title, student_table.stuname, stufile_table.url FROM lesorder_table LEFT JOIN lesson_table ON lesorder_table.lesserial = lesson_table.serial LEFT JOIN student_table ON lesorder_table.stuserial = student_table.serial LEFT JOIN stufile_table ON lesorder_table.lesserial = stufile_table.lesserial AND lesorder_table.stuserial = stufile_table.stuserial WHERE lesorder_table.stuserial =".$serial
+
+	-->

@@ -383,4 +383,13 @@ abstract class KISS_Model  {
     $stmt->execute();
     return $stmt->fetchAll($pdo_fetch_mode);
   }
+
+  function select_clause($selectstring="",$pdo_fetch_mode=PDO::FETCH_ASSOC) {
+    if(strcmp($selectstring,"")==0) return array(); 
+    $dbh=$this->getdbh();
+    $sql = $selectstring;
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll($pdo_fetch_mode);
+  }
 }

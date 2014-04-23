@@ -192,17 +192,23 @@
 						<h4><strong>我的课程</strong></h4>
 						<table class="table table-striped table-hover">
 						  <thead>
-								<tr><th>#</th><th>课程</th><th>期次</th><th>加入时间</th><th>文件(冒泡提示文件标题)</th><th>操作</th></tr>
+								<tr><th>#</th><th>课程</th><th>文件</th><th>操作</th></tr>
 							</thead>
 							<tbody>
 								<?php 
+									if(isset($_SESSION['stuserial']))
 									$ord=new tabLesorder();
-									$array=$ord->retrieve_many("stuserial=? ORDER BY utime DESC",$_SESSION['stuserial']);
-									$i=1;
-									foreach ($array as $ord) { ?>
-									<tr><td><?php echo $i;$i=$i+1;?></td><td>?</td><td><?php echo $ord->get('lesserial');?></td><td><?php echo edt2sh($ord->get('utime'));?></td><td>?</td><td>退出</td></tr>
+									$array=$ord->select_clause("select lesorder_table.serial as os, lesson_table.title as lt, stufile_table.title as ft, stufile_table.url as fu FROM lesorder_table LEFT JOIN lesson_table ON lesorder_table.lesserial = lesson_table.serial LEFT JOIN stufile_table ON lesorder_table.lesserial = stufile_table.lesserial AND lesorder_table.stuserial = stufile_table.stuserial WHERE lesorder_table.stuserial =".$_SESSION['stuserial']);
+									$i=0;
+									foreach ($array as $obj1) { ?>
+									<tr>
+										<td><?php $i=$i+1;echo $i;?></td>
+										<td><?php echo $obj1['lt'];?></td>
+										<td><?php if($obj1['fu']) echo fileIconImgTagBlock($obj1['fu'],$obj1['ft'],"a_id_".$i);?></td><!-- file icon-->
+										<td><?php if($obj1['fu']) echo "<a href='#'>更新文件</a>";else echo "<a href='#'>上传文件</a>";echo " | <a href='#'>退出课程</a>"; ?></td><!-- add file or update file, quit lesson.-->
+									</tr>
+									<?php $numActivateTooltip=$i; ?>
 								<?php } ?>
-								
 							</tbody>
 						</table>
 						<hr>
@@ -245,5 +251,14 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+    <!-- 激活Tooltip -->
+    <?php
+    	for ($i=1; $i<=$numActivateTooltip; $i++)
+		{
+  			echo "$('#a_id_".$i."').tooltip('hide');";
+		}
+    ?>
+    </script>
   </body>
 </html>
