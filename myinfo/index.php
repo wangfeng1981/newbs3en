@@ -205,7 +205,7 @@
 										<td><?php $i=$i+1;echo $i;?></td>
 										<td><?php echo $obj1['lt'];?></td>
 										<td><?php if($obj1['fu']) echo fileIconImgTagBlock($obj1['fu'],$obj1['ft'],"a_id_".$i);?></td><!-- file icon-->
-										<td><?php if($obj1['fu']) echo "<a href='#'>更新文件</a>";else echo "<a href='#'>上传文件</a>";echo " | <a href='#'>退出课程</a>"; ?></td><!-- add file or update file, quit lesson.-->
+										<td><?php if($obj1['fu']) echo "<a href='#' onclick=\"$('#modalUploadPpt').modal('show');\">更新文件</a>";else echo "<a href='#' onclick=\"$('#modalUploadPpt').modal('show');\">上传文件</a>";echo " | <a href='#'>退出课程</a>"; ?></td><!-- add file or update file, quit lesson.-->
 									</tr>
 									<?php $numActivateTooltip=$i; ?>
 								<?php } ?>
@@ -231,6 +231,11 @@
 							</tbody>
 						</table>
 						<hr>
+
+						<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalUploadPpt">
+						  Launch demo modal
+						</button>
+
 						<!-- leave a comment block -->
 						<?php leaveACommentBlock(); ?>
 						
@@ -240,6 +245,59 @@
 			</div>
 		</div>
 		
+	</div>
+
+
+	<!-- Upload file modal dialog -->
+	<div class="modal fade" id="modalUploadPpt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="myModalLabel">上传PPT文件</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form class="form-horizontal" action="" method="post">
+
+			  <!-- Text input-->
+			  <div class="form-group">
+			    <label class="col-md-4 control-label" for="lestitle">课程</label>  
+			    <div class="col-md-4">
+			    <input id="lestitle" name="lestitle" type="text" placeholder="" class="form-control input-md">
+			      
+			    </div>
+			  </div>
+
+			  <!-- Text input-->
+			  <div class="form-group">
+			    <label class="col-md-4 control-label" for="filetitle">PPT标题</label>  
+			    <div class="col-md-4">
+			    <input id="filetitle" name="filetitle" type="text" placeholder="" class="form-control input-md" required="">
+			      
+			    </div>
+			  </div>
+
+			  <!-- File Button --> 
+			  <div class="form-group">
+			    <label class="col-md-4 control-label" for="file">PPT文件</label>
+			    <div class="col-md-4">
+			      <input id="file" name="file" class="input-file" type="file">
+			    </div>
+			  </div>
+
+			  <!-- Button (Double) -->
+			  <div class="form-group">
+			    <label class="col-md-4 control-label" for="submit"></label>
+			    <div class="col-md-8">
+			      <button id="submit" name="submit" class="btn btn-success">提交</button>
+			      <button id="" name="" class="btn btn-warning" data-dismiss="modal">取消</button>
+			    </div>
+			  </div>
+
+			</form>
+	      </div>
+	    </div>
+	  </div>
 	</div>
 
 	<!-- Footer block  -->
