@@ -187,7 +187,7 @@ function template($iactive)
 	//侧边导航栏
 	$pages = array(
 		array("","首页"),
-		array("myinfo","我的信息"),
+		array("myinfo","我的资料"),
 		array("activity","课程"),
 		array("news","通知"),
 		array("comments","评论"),
@@ -735,6 +735,52 @@ function template($iactive)
 	  <strong><?php echo $atitle;?></strong> <?php echo $amsg;?>
 	</div>
 <?php } ?>
+
+
+
+
+<?php function jSaveStudentPhotoFile($stuserial) {
+	/* 保存上传的头像文件到 ../photos/photo-201300000000001.ext 文件
+	 * 并负责写入student_table中对应的学生记录photo字段  
+	*/
+	$allowedExts = array("gif", "jpeg", "jpg", "png");
+	$temp = explode(".", $_FILES["file"]["name"]);
+	$extension = end($temp);
+
+	if ((($_FILES["file"]["type"] == "image/gif")
+	|| ($_FILES["file"]["type"] == "image/jpeg")
+	|| ($_FILES["file"]["type"] == "image/jpg")
+	|| ($_FILES["file"]["type"] == "image/pjpeg")
+	|| ($_FILES["file"]["type"] == "image/x-png")
+	|| ($_FILES["file"]["type"] == "image/png"))
+	&& ($_FILES["file"]["size"] < 11000 )
+	&& in_array($extension, $allowedExts)) {
+	  if ($_FILES["file"]["error"] > 0) {
+	    return false ;
+	  } 
+	  else {
+	  	$destfilename="photo-".$stuserial.".".$extension;
+   	    if (file_exists("../photos/".$destfilename)) 
+    	      unlink("../photos/".$destfilename);
+	    if( move_uploaded_file($_FILES["file"]["tmp_name"],
+	      "../photos/".$destfilename) )
+	    {
+	    	$stu=new tabStudent();
+	    	$stu->retrieve($stuserial) ;
+	    	if($stu->exists())
+	    	{
+	    		$stu->set('photo',$destfilename);
+	    		$stu->update();
+	    	}else return false ;
+	    }else
+	        return false ;
+	  }
+	} else {
+	  return false;
+	}
+	return true;
+}
+?>
 
 
 
