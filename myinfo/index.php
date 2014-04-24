@@ -110,7 +110,7 @@
 														<div class="form-group">
 														  <label class="col-md-4 control-label" for="photo">新头像文件</label>
 														  <div class="col-md-4">
-														    <input id="file" name="file" class="input-file" type="file">
+														    <input name="file" class="input-file" type="file">
 														    <span class="help-block">请上传50x50 小于10k的jpg,png,gif文件.</span>  
 														  </div>
 														</div>
@@ -198,14 +198,14 @@
 								<?php 
 									if(isset($_SESSION['stuserial']))
 									$ord=new tabLesorder();
-									$array=$ord->select_clause("select lesorder_table.serial as os, lesson_table.title as lt, stufile_table.title as ft, stufile_table.url as fu FROM lesorder_table LEFT JOIN lesson_table ON lesorder_table.lesserial = lesson_table.serial LEFT JOIN stufile_table ON lesorder_table.lesserial = stufile_table.lesserial AND lesorder_table.stuserial = stufile_table.stuserial WHERE lesorder_table.stuserial =".$_SESSION['stuserial']);
+									$array=$ord->select_clause("select lesorder_table.serial as os,lesorder_table.lesserial as ls, lesorder_table.stuserial as ss, lesson_table.title as lt, stufile_table.title as ft, stufile_table.url as fu FROM lesorder_table LEFT JOIN lesson_table ON lesorder_table.lesserial = lesson_table.serial LEFT JOIN stufile_table ON lesorder_table.lesserial = stufile_table.lesserial AND lesorder_table.stuserial = stufile_table.stuserial WHERE lesorder_table.stuserial =".$_SESSION['stuserial']);
 									$i=0;
 									foreach ($array as $obj1) { ?>
 									<tr>
 										<td><?php $i=$i+1;echo $i;?></td>
 										<td><?php echo $obj1['lt'];?></td>
 										<td><?php if($obj1['fu']) echo fileIconImgTagBlock($obj1['fu'],$obj1['ft'],"a_id_".$i);?></td><!-- file icon-->
-										<td><?php if($obj1['fu']) echo "<a href='#' onclick=\"$('#modalUploadPpt').modal('show');\">更新文件</a>";else echo "<a href='#' onclick=\"$('#modalUploadPpt').modal('show');\">上传文件</a>";echo " | <a href='#'>退出课程</a>"; ?></td><!-- add file or update file, quit lesson.-->
+										<td><?php if($obj1['fu']) echo "<a onclick='showPptDialog(".$obj1['ls'].','.$obj1['ss'].")' >更新文件</a>";else echo "<a onclick='showPptDialog(".$obj1['ls'].','.$obj1['ss'].")'>上传文件</a>";echo " | <a href='index.php?quitles=".$obj1['os']."'>退出课程</a>"; ?></td><!-- add file or update file, quit lesson.-->
 									</tr>
 									<?php $numActivateTooltip=$i; ?>
 								<?php } ?>
@@ -232,10 +232,6 @@
 						</table>
 						<hr>
 
-						<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalUploadPpt">
-						  Launch demo modal
-						</button>
-
 						<!-- leave a comment block -->
 						<?php leaveACommentBlock(); ?>
 						
@@ -257,7 +253,7 @@
 	        <h4 class="modal-title" id="myModalLabel">上传PPT文件</h4>
 	      </div>
 	      <div class="modal-body">
-	        <form class="form-horizontal" action="" method="post">
+	        <form class="form-horizontal" method="post" action="http://up.qiniu.com/" enctype="multipart/form-data">
 
 			  <!-- Text input-->
 			  <div class="form-group">
@@ -279,17 +275,20 @@
 
 			  <!-- File Button --> 
 			  <div class="form-group">
-			    <label class="col-md-4 control-label" for="file">PPT文件</label>
+			    <label class="col-md-4 control-label" for="fileppt">PPT文件</label>
 			    <div class="col-md-4">
-			      <input id="file" name="file" class="input-file" type="file">
+			      <input id="file" name="file" class="input-file" type="file" onChange='onPptFileChanged()'>
 			    </div>
 			  </div>
+
+			  <input name="key" id="key" type="text" value="<resource_key>">
+			  <input name="token" id="token" type="text" value="<upload_token>">
 
 			  <!-- Button (Double) -->
 			  <div class="form-group">
 			    <label class="col-md-4 control-label" for="submit"></label>
 			    <div class="col-md-8">
-			      <button id="submit" name="submit" class="btn btn-success">提交</button>
+			      <button type="submit" name="submitppt" id="submitppt" class="btn btn-success" disabled='disabled' >提交</button>
 			      <button id="" name="" class="btn btn-warning" data-dismiss="modal">取消</button>
 			    </div>
 			  </div>
@@ -309,6 +308,10 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	
+</script>
     <script type="text/javascript">
     <!-- 激活Tooltip -->
     <?php
@@ -317,6 +320,41 @@
   			echo "$('#a_id_".$i."').tooltip('hide');";
 		}
     ?>
+
+    var les=0;
+    var stu=0;
+
+    function onPptFileChanged()
+	{
+		var exts = ['ppt','pptx','pdf'];
+		var fullfilepath=$('#file').val();
+		var get_ext = fullfilepath.split('.');
+		get_ext = get_ext.reverse();
+		get_ext=get_ext[0].toLowerCase();
+		if ( $.inArray ( get_ext, exts ) > -1 )
+		{
+			var destfilename=""+les+"/"+stu+"."+get_ext;
+			$('#key').val(destfilename);
+			$.get( "../qiniu/uptoken.php", { bucket: "gradunion", key: destfilename } )
+			  .done(function( data ) {
+			  	var obj = jQuery.parseJSON( data );
+			    $('#token').val(obj.uptoken);
+			    $('#submitppt').removeAttr('disabled');
+			  });
+		}else
+		{
+			alert('不支持的文件格式.');
+		}
+
+	}
+
+	function showPptDialog(les1,stu1)
+	{
+		les=les1;
+		stu=stu1;
+		$('#modalUploadPpt').modal('show');
+	}
+
     </script>
   </body>
 </html>
