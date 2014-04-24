@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript">
+	function onchange1()
+	{
+		var exts = ['ppt','pptx','pdf'];
+		var fullfilepath=$('#file').val();
+		var get_ext = fullfilepath.split('.');
+		get_ext = get_ext.reverse();
+		get_ext=get_ext[0].toLowerCase();
+		if ( $.inArray ( get_ext, exts ) > -1 )
+		{
+			var destfilename="222/"+"20130001."+get_ext;
+			$('#key').val(destfilename);
+			$.get( "uptoken.php", { bucket: "gradunion", key: destfilename } )
+			  .done(function( data ) {
+			  	var obj = jQuery.parseJSON( data );
+			    $('#token').val(obj.uptoken);
+			    $('#submit1').removeAttr('disabled');
+			  });
+		}else
+		{
+			alert('unsupported file format.');
+		}
+
+	}
+</script>
+<body>
+<form method="post" action="http://up.qiniu.com/"
+ enctype="multipart/form-data">
+  <input name="key" id="key" type="text" value="<resource_key>">
+  <input name="token" id="token" type="text" value="<upload_token>">
+  <input name="file" id="file" type="file" onChange='onchange1()' />
+  <input name="submit" id="submit1" type="submit" value="submit" disabled='disabled'>
+</form>
+</body>
+</html>

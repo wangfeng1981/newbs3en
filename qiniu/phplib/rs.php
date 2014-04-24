@@ -70,8 +70,7 @@ class Qiniu_RS_PutPolicy
 		if ($deadline == 0) {
 			$deadline = 3600;
 		}
-		//$deadline += time();
-		$deadline = 1398299792;/* debug */
+		$deadline += time();
 
 		$policy = array('scope' => $this->Scope, 'deadline' => $deadline);
 		if (!empty($this->CallbackUrl)) {
@@ -120,8 +119,7 @@ class Qiniu_RS_PutPolicy
 			$policy['mimeLimit'] = $this->MimeLimit;
 		}
 
-
-		$b = json_encode($policy);
+		$b = json_encode($policy);//JSON_UNESCAPED_SLASHES);
 		return Qiniu_SignWithData($mac, $b);
 	}
 }
