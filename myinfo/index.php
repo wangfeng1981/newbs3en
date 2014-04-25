@@ -298,6 +298,24 @@
 	    </div>
 	  </div>
 	</div>
+	
+	<?php
+	// debug
+		if( isset($_GET['upload_ret']))
+		{
+			echo "<p>ret:";
+
+			$retobj=base64_decode($_GET['upload_ret']);
+			echo $retobj;
+			echo '<br>aaa<br>bbb';
+			echo $retobj->les.'<br>';
+			$retobj2=json_decode($retobj);//HERE HERE
+			echo $retobj2['les'].'-les<br>';
+			echo $retobj2['stu'].'-stu<br>';
+			echo "</p>";
+		}
+
+	?>
 
 	<!-- Footer block  -->
 	<?php footerBlock(); ?>
@@ -335,11 +353,18 @@
 		{
 			var destfilename=""+les+"/"+stu+"."+get_ext;
 			$('#key').val(destfilename);
-			$.get( "../qiniu/uptoken.php", { bucket: "gradunion", key: destfilename } )
+			$.get( "../qiniu/uptoken.php", { bucket: "gradunion", key: destfilename, rurl:"<?php echo urlencode($GLOBALS['gSiteRootPath'].'myinfo/index.php');?>",les:les } )
 			  .done(function( data ) {
 			  	var obj = jQuery.parseJSON( data );
-			    $('#token').val(obj.uptoken);
-			    $('#submitppt').removeAttr('disabled');
+			  	if(obj.uptoken.length>1)
+			  	{
+			  		$('#token').val(obj.uptoken);
+			    	$('#submitppt').removeAttr('disabled');
+			  	}else
+			  	{
+			  		alert('参数错误,可能是因为登录过期或者课程失效.');
+			  	}
+			   
 			  });
 		}else
 		{
