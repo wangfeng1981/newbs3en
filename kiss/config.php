@@ -1,11 +1,8 @@
 ﻿<?php 
-
 //===============================================
 // Includes
 //===============================================
 require('kissmvc.php');
-
-
 //===============================================
 // 全局变量
 //===============================================
@@ -49,9 +46,22 @@ $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 			parent::__construct('serial','comments_table','getdbh');
 			$this->rs['serial']=0;
 			$this->rs['bystuserial']=0;
-			$this->rs['message']='';
+			$this->rs['message']=''; //256 byte.
 			$this->rs['utime']=0;
+			$this->rs['replyserial']=0;//deprecated field.
+		}
+	}
+	//=====================================================
+	class tabC2 extends Model
+	{
+		function tabC2()
+		{
+			parent::__construct('serial','c2_table','getdbh');
+			$this->rs['serial']=0;
 			$this->rs['replyserial']=0;
+			$this->rs['stuserial']=0;
+			$this->rs['message']='';//256 byte.
+			$this->rs['utime']=0;
 		}
 	}
 	//=====================================================
@@ -521,7 +531,7 @@ function template($iactive)
 				echo "<div class='jcomment'>评论列表为空。</div>";
 			}
 
-			$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, comments_table.replyserial as creply, student_table.stuname as sname, student_table.photo as sphoto";
+			$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, student_table.stuname as sname, student_table.photo as sphoto";
 			$frmstr="comments_table,student_table";
 			$whrstr="comments_table.bystuserial=student_table.serial GROUP BY comments_table.serial ORDER BY comments_table.utime DESC LIMIT ".$startindex.",".$nshow ;
 
@@ -542,6 +552,13 @@ function template($iactive)
 				  </div>
 				  <div class="jcomment-footer">
 				  	<?php echo edt2sh($cmt['cutime']);?>
+				  	<a href="#">评论(
+				  		<?php 
+				  		$c2=new tabC2() ;
+				  		$arr=$c2->select("count(serial) as nreply","replyserial=?",$cmt['cserial']) ;
+				  		echo $arr[0]['nreply'];?>
+				  	)
+				  	</a>
 				  </div>
 				</div>
 
@@ -709,7 +726,7 @@ function template($iactive)
 	<!-- footer: copyright , date , develope team , etc  -->
 	<footer class="bs-docs-footer" role="contentinfo">
 	  <div class="container">
-	    <p>Designed and built by <a id="weibome" data-toggle="tooltip" data-placement="top" title="关注我" href="http://weibo.com/wangfengirsa" target="_blank">@wangfengirsa</a>. Copyright © 2014 jfwf@yeah.net</p>
+	    <p>Designed and built by <a href="mailto:#">wangfeng@irsa.ac.cn</a>. Copyright © 2014 gradunion.cn</p>
 	  </div>
 	</footer>
 <?php } ?>
@@ -788,7 +805,7 @@ function template($iactive)
 	if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
 	else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
 	else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
-	echo "<a id='".$atagid."' target='_blank' href='".$fileurl."' data-toggle='tooltip' data-placement='bottom' title='".$filetitle."''>";
+	echo "<a id='".$atagid."' target='_blank' href='".$fileurl."' data-toggle='tooltip' data-placement='bottom' title='".$filetitle."' >";
 	echo "<img class='jlesfileicon2' src='".$GLOBALS['gSiteRootPath'].$typeicon."'>";
 	echo "</a>";
 }

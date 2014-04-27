@@ -1,0 +1,48 @@
+<?php session_start(); ?>
+<?php 
+require_once('phplib/rs.php');
+require('../kiss/config.php');
+
+if(isset($_GET['bucket']) && isset($_GET['key']) && isset($_GET['rurl']) && isset($_GET['rv1']) && isset($_GET['rv2']) && isset($_SESSION['stuserial']))
+{
+	//write into stufile table.
+	$ord=new tabLesorder();
+	$ord->retrieve($_GET['rv1']) ;
+	$sfile=new tabStufile();
+	$sfile->retrieve_one("stuserial=? AND lesserial=?" , array($ord->get('stuserial'),$ord->get('lesserial')));
+	if($sfile)
+	{
+		$sfile->set('utime',0);
+		$sfile->set('title',$_GET['rv2']);
+		$sfile->update();
+	}else
+	{
+		$sfile->set('stuserial',$ord->get('stuserial'));
+		$sfile->set('lesserial',$ord->get('lesserial'));
+		$sfile->set('utime',0);
+		$sfile->set('url',"");
+		$sfile->set('title',$_GET['rv2']);
+		$sfile->create();
+	}
+
+	// build token string.
+	$bucket=$_GET['bucket'];
+	$key1=$_GET['key'];
+	$scope=$bucket.":".$key1 ;
+
+	$accessKey = 'Dlg_hYbpSA5VGIYIYu2pm7q5Gx1HJlh014YTUJF2';
+	$secretKey = 'oKm1Pr65k_oIMOw5ZHc0pisQbai_dYodi_NoQqDl';
+	Qiniu_setKeys($accessKey, $secretKey);
+
+	$putPolicy = new Qiniu_RS_PutPolicy($scope);
+	$putPolicy->ReturnUrl=urldecode($_GET['rurl']);
+	$putPolicy->ReturnBody=json_encode( array('rv1'=>$_GET['rv1'],'rv2'=>0));/*debug 'rv2'=>$_GET['rv2'],'bk'=>$_GET['bucket'],'ky'=>$_GET['key']*/
+	$upToken = $putPolicy->Token(null);
+	echo json_encode(array("uptoken"=>$upToken)); 
+}else
+{
+	echo json_encode(array("error"=>"error: less inparams.")); 
+}
+
+
+?>

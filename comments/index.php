@@ -50,15 +50,49 @@
 					  </div>
 					</div>
 					<div class="col-md-8 column">
-						<h4>全部留言</h4>
-						<hr>
-						<!-- comments -->
-						<?php 
-							$ipage=0;
-							if(isset($_GET['icpage']))
-								$ipage=intval($_GET['icpage']);
-							commentsBlock(5,$ipage,1); ?>
+						<?php if(isset($_GET['view'])) { ?>
+							<p><a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">返回全部留言</a></p>
+							<?php
+								$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, student_table.stuname as sname, student_table.photo as sphoto";
+								$frmstr="comments_table,student_table";
+								$whrstr="comments_table.bystuserial=student_table.serial AND comments_table.serial=".$_GET['view'];
 
+								$cmt = new tabComments() ;
+								$cmt_array = $cmt->select_mt($selstr,$frmstr,$whrstr);
+								$cmt=$cmt_array[0] ; ?>
+									<div class="jcomment">
+									  <div class="jcomment-photo">
+									  	<img src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$cmt['sphoto'];?>" width='50' height='50'>
+									  </div>
+									  <div class="jcomment-header">
+									    <?php echo $cmt['sname'];?>
+									  </div>
+									  <div class="jcomment-body">
+									    <?php echo $cmt['cmessage'];?>
+									  </div>
+									  <div class="jcomment-footer">
+									  	<?php echo edt2sh($cmt['cutime']);?>
+									  	<a href="#">评论(
+									  		<?php 
+									  		$c2=new tabC2() ;
+									  		$arr=$c2->select("count(serial) as nreply","replyserial=?",$cmt['cserial']) ;
+									  		echo $arr[0]['nreply'];?>
+									  	)
+									  	</a>
+									  </div>
+									</div>
+
+						<?php }/*end if */ ?>
+						<?php else { ?>
+							<h4>全部留言</h4>
+							<hr>
+							<!-- comments -->
+							<?php 
+								$ipage=0;
+								if(isset($_GET['icpage']))
+									$ipage=intval($_GET['icpage']);
+								commentsBlock(5,$ipage,1); ?>
+						<?php }/* endelse */ ?>
 						<hr>
 						<!-- leave a comment block -->
 						<?php leaveACommentBlock(); ?>
