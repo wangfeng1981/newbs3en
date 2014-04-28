@@ -1,16 +1,5 @@
 ﻿<?php session_start(); ?>
 <?php require('../kiss/config.php'); ?>
-<?php
-	
-	if( isset($_SESSION['stuserial']) && $_POST['comment'])
-	{
-		$cmt = new tabComments();
-		$cmt->set('bystuserial',$_SESSION['stuserial']);
-		$cmt->set('message',$_POST['comment']);
-		$cmt->set('utime',time());
-		$cmt->create();
-	}
-?>
 
 <!DOCTYPE html>
 <html lang="zh-cn">
@@ -50,52 +39,73 @@
 					  </div>
 					</div>
 					<div class="col-md-8 column">
-						<?php if(isset($_GET['view'])) { ?>
-							<p><a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">返回全部留言</a></p>
-							<?php
-								$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, student_table.stuname as sname, student_table.photo as sphoto";
-								$frmstr="comments_table,student_table";
-								$whrstr="comments_table.bystuserial=student_table.serial AND comments_table.serial=".$_GET['view'];
+						<?php
+						
+							if( isset($_SESSION['stuserial']) && isset($_POST['comment']) && isset($_POST['icmt']) && isset($_POST['ireply']) )
+							{
+								if($_POST['icmt']==0 && $_POST['ireply']==0 )
+								{
+									$cmt = new tabComments();
+									$cmt->set('bystuserial',$_SESSION['stuserial']);
+									$cmt->set('message',$_POST['comment']);
+									$cmt->set('utime',time());
+									$cmt->create();
+									jAlertBlock($atype="alert-success",$atitle="OK!",$amsg="留言成功.");
+								}else if( $_POST['icmt'] > 0 )
+								{
+									$c2=new tabC2() ;
+									$c2->set('stuserial',$_SESSION['stuserial']);
+									$c2->set('replyserial',$_POST['icmt']);
+									$c2->set('message',$_POST['comment']);
+									$c2->set('utime',time());
+									$c2->create();
+									jAlertBlock($atype="alert-success",$atitle="OK!",$amsg="评论成功.");
+								}else
+								{
+									$c2=new tabC2() ;
+									$c2->retrieve($_POST['ireply']);
 
-								$cmt = new tabComments() ;
-								$cmt_array = $cmt->select_mt($selstr,$frmstr,$whrstr);
-								$cmt=$cmt_array[0] ; ?>
-									<div class="jcomment">
-									  <div class="jcomment-photo">
-									  	<img src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$cmt['sphoto'];?>" width='50' height='50'>
-									  </div>
-									  <div class="jcomment-header">
-									    <?php echo $cmt['sname'];?>
-									  </div>
-									  <div class="jcomment-body">
-									    <?php echo $cmt['cmessage'];?>
-									  </div>
-									  <div class="jcomment-footer">
-									  	<?php echo edt2sh($cmt['cutime']);?>
-									  	<a href="#">评论(
-									  		<?php 
-									  		$c2=new tabC2() ;
-									  		$arr=$c2->select("count(serial) as nreply","replyserial=?",$cmt['cserial']) ;
-									  		echo $arr[0]['nreply'];?>
-									  	)
-									  	</a>
-									  </div>
-									</div>
+									$r1=new tabC2() ;
+									$r1->set('stuserial',$_SESSION['stuserial']);
+									$r1->set('replyserial',$c2->get('replyserial'));
+									$r1->set('message',$_POST['comment']);
+									$r1->set('utime',time());
+									$r1->create();
+									jAlertBlock($atype="alert-success",$atitle="OK!",$amsg="回复成功.");
+								}
+								
+							}
+						?>
 
-						<?php }/*end if */ ?>
-						<?php else { ?>
-							<h4>全部留言</h4>
-							<hr>
-							<!-- comments -->
-							<?php 
-								$ipage=0;
-								if(isset($_GET['icpage']))
-									$ipage=intval($_GET['icpage']);
-								commentsBlock(5,$ipage,1); ?>
-						<?php }/* endelse */ ?>
-						<hr>
-						<!-- leave a comment block -->
-						<?php leaveACommentBlock(); ?>
+						<?php if(isset($_GET['view'])) { 
+							echo "<p><a href='".$GLOBALS['gSiteRootPath'].'comments/'."'>返回全部留言</a></p><hr>";
+							$cmt=new tabComments() ;
+							$cmt->retrieve($_GET['view']) ;
+							if($cmt->exists())
+								oneCommentBlock($cmt,1) ;
+							if(isset($_GET['reply']))
+							{
+								//leave reply.
+								leaveACommentBlock(0,$_GET['reply']);
+							}else
+							{
+								//leave comment.
+								leaveACommentBlock($_GET['view'],0);
+							}
+
+						 }/*end if */else
+						 {
+						 	echo "<h4><strong>全部留言</strong></h4>";
+						 	echo "<hr>";
+						 	$ipage=0;
+						 	if(isset($_GET['icpage']))
+						 		$ipage=intval($_GET['icpage']);
+						 	commentsBlock(10,$ipage,1);
+						 	echo "<hr>";
+						 	leaveACommentBlock(0,0);
+						 } 
+
+						 ?>
 					</div>
 					
 				</div>

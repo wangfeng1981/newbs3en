@@ -66,7 +66,7 @@
 						<?php newsBlock(); ?>
 
 						<hr>
-						<h4><strong>最新评论</strong></h4>
+						<h4><strong>最新留言</strong></h4>
 						<hr>
 						<!-- comments -->
 						<?php commentsBlock(); ?>

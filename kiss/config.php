@@ -200,7 +200,7 @@ function template($iactive)
 		array("myinfo","我的资料"),
 		array("activity","课程"),
 		array("news","通知"),
-		array("comments","评论"),
+		array("comments","留言"),
 		array("file","文件资源"),
 		array("hr",""),
 		array("help","帮助"),
@@ -442,7 +442,7 @@ function template($iactive)
 		    我选择了2014年第一期开题，欢迎大家参加.
 		  </div>
 		  <div class="jcomment-footer">
-		  	2014年1月1日 23:53 <a href="#">评论(2)</a>
+		  	2014年1月1日 23:53 <a href="#">留言(2)</a>
 		  </div>
 		</div>
 	*/
@@ -493,101 +493,7 @@ function template($iactive)
 <?php } ?>
 
 
-<?php function commentsBlock($nshow=5,$ipage=0,$showpager=0) { 
-	//最新评论显示 $ipage is zero based.
-	/*
-	SELECT news_table.message AS msg, admin_table.adminname AS name
-		FROM news_table, admin_table
-		WHERE news_table.byadminserial = admin_table.serial
-		GROUP BY admin_table.serial
-		ORDER BY news_table.utime DESC 
-		LIMIT 0 , 30
 
-		<div class="jcomment">
-		  <div class="jcomment-photo">
-		  	<img src="photos/1-1.jpg">
-		  </div>
-		  <div class="jcomment-header">
-		    孙俪
-		  </div>
-		  <div class="jcomment-body">
-		    我选择了2014年第一期开题，欢迎大家参加.
-		  </div>
-		  <div class="jcomment-footer">
-		  	2014年1月1日 23:53 <a href="#">评论(2)</a>
-		  </div>
-		</div>
-	*/
-
-	?>
-
-		<?php 
-			$cmt=new tabComments();
-			$ncnt=$cmt->select("count(serial) as cnt","serial>0");
-			$totalNumComments=0+$ncnt[0]['cnt'];
-			$startindex=$ipage*$nshow;
-			$npage=ceil($totalNumComments/$nshow);
-			if( $totalNumComments == 0 ) {
-				echo "<div class='jcomment'>评论列表为空。</div>";
-			}
-
-			$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, student_table.stuname as sname, student_table.photo as sphoto";
-			$frmstr="comments_table,student_table";
-			$whrstr="comments_table.bystuserial=student_table.serial GROUP BY comments_table.serial ORDER BY comments_table.utime DESC LIMIT ".$startindex.",".$nshow ;
-
-			$cmt = new tabComments() ;
-			$cmt_array = $cmt->select_mt($selstr,$frmstr,$whrstr);
-
-			foreach ($cmt_array as $cmt) { ?>
-
-				<div class="jcomment<?php if($cmt['creply']>0) echo '-reply';?>">
-				  <div class="jcomment-photo">
-				  	<img src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$cmt['sphoto'];?>" width='50' height='50'>
-				  </div>
-				  <div class="jcomment-header">
-				    <?php echo $cmt['sname'];?>
-				  </div>
-				  <div class="jcomment-body">
-				    <?php echo $cmt['cmessage'];?>
-				  </div>
-				  <div class="jcomment-footer">
-				  	<?php echo edt2sh($cmt['cutime']);?>
-				  	<a href="#">评论(
-				  		<?php 
-				  		$c2=new tabC2() ;
-				  		$arr=$c2->select("count(serial) as nreply","replyserial=?",$cmt['cserial']) ;
-				  		echo $arr[0]['nreply'];?>
-				  	)
-				  	</a>
-				  </div>
-				</div>
-
-		<?php } ?>
-		<?php if( $showpager==0 && $totalNumComments>$nshow ) { ?>
-			<div class="jcomment"><a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">更多... ...</a></div>
-		<?php }else if($showpager==1){ ?>
-			<ul class="pagination">
-				<li <?php if($ipage<=0) echo "class='disabled'";?>>
-					<a href="<?php if($ipage<=0) echo '#'; else echo $GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.($ipage-1);?>">&laquo;</a>
-				</li>
-				<?php 
-					$ivalid=0;
-					for ($i = $ipage-2; $i < 5+2 ; $i++) {
-						if( $i<0 ) continue ;
-						if( $i==$npage ) break;
-						$ivalid=$ivalid+1;
-						$str1="";
-						if($i==$ipage) $str1="class='active'";
-    					echo "<li ".$str1."><a href='".$GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.$i."'>".($i+1)."</a></li>";
-						if($ivalid==5) break;
-					}
-				?>
-				<li <?php if($ipage>=$npage-1) echo "class='disabled'";?>>
-					<a href="<?php if($ipage>=$npage-1) echo '#';else echo $GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.($ipage+1);?>">&raquo;</a>
-				</li>
-			</ul>
-		<?php } ?>
-<?php } ?>
 
 
 <?php function filesBlock($nshow=5,$ipage=0) { 
@@ -732,15 +638,77 @@ function template($iactive)
 <?php } ?>
 
 
-<?php function leaveACommentBlock(){ ?>
+<?php function leaveACommentBlock($icmt=0,$ireply=0){ 	
+	$acturl=$GLOBALS['gSiteRootPath'].'comments/index.php';
+	if($icmt>0)
+		$acturl=$acturl."?view=".$icmt;
+	else if( $ireply> 0 )
+	{
+		$c2=new tabC2() ;
+		$c2->retrieve($ireply);
+		if($c2->exists())
+		{
+			$acturl=$acturl."?view=".$c2->get('replyserial');
+		}
+	}
+
+	?>
+	<!-- icmt=0 and ireply=0 leave a comment; else $icmt>0 reply a comment; else $ireply>0 reply a reply.-->
 	<!-- 页面底端留言 -->
-	<form role="form" id="formcomment" name="formcomment" action="<?php echo $GLOBALS['gSiteRootPath'].'comments/index.php';?>" method="post">
+	<form role="form" id="formcomment" name="formcomment" action="<?php echo $acturl;?>" method="post">
 		<div class="form-group">
-	  		<textarea class="form-control" rows="3" id="comment" name="comment" placeholder="请输入留言"></textarea>
+			<input type="hidden" id="icmt" name="icmt" value="<?php echo $icmt;?>">
+			<input type="hidden" id="ireply" name="ireply" value="<?php echo $ireply;?>">
+			<?php 
+				$msg0="";
+				if($icmt==0 && $ireply>0 )
+				{
+					$c2=new tabC2() ;
+					$c2->retrieve($ireply) ;
+					if($c2->exists())
+					{
+						$stu=new tabStudent() ;
+						$stu->retrieve($c2->get('stuserial'));
+						$msg0="回复 ".$stu->get('stuname').": ";
+					}
+				}
+			?>
+	  		<textarea maxlength='100' class="form-control" rows="3" id="comment" name="comment" placeholder="请输入留言或评论,最多100字"><?php echo $msg0;?></textarea>
 		</div>
-		<p><?php if(isset($_SESSION['stuserial'])==false) echo "<span class='label label-warning'>请登录后进行留言.</span>" ?></p>
-		<button type="submit" class="btn btn-info" <?php if(isset($_SESSION['stuserial'])==false) echo "disabled";?> >提交留言</button>
+		<p><?php if(isset($_SESSION['stuserial'])==false) echo "<span class='label label-warning'>请登录后进行留言或评论.</span>" ?></p>
+		<button type="submit" class="btn btn-info" <?php if(isset($_SESSION['stuserial'])==false) echo "disabled";?> >
+			<?php
+				if($icmt==0&&$ireply==0)
+					echo "提交留言";
+				else if($icmt>0)
+					echo "提交评论";
+				else echo "提交回复";
+			?>	
+		</button>
 	</form>
+	<script type="text/javascript">
+		$(function() {        
+		    // Get all textareas that have a "maxlength" property.
+		    $('textarea[maxlength]').each(function() {
+
+		        // Store the jQuery object to be more efficient...
+		        var $textarea = $(this);
+
+		        // Store the maxlength and value of the field.
+		        var maxlength = $textarea.attr('maxlength');
+		        var val = $textarea.val();
+
+		        // Trim the field if it has content over the maxlength.
+		        $textarea.val(val.slice(0, maxlength));
+
+		        // Bind the trimming behavior to the "keyup" event.
+		        $textarea.bind('keyup', function() {
+		            $textarea.val($textarea.val.slice(0, maxlength));
+		        });
+
+		    });
+		});
+	</script>
 
 <?php } ?>
 
@@ -810,6 +778,142 @@ function template($iactive)
 	echo "</a>";
 }
 ?>
+
+<?php
+/* 输出单个留言评论 */
+function oneReplyBlock($cmt,$reply)
+{
+	$stu=new tabStudent();
+	$stu->retrieve($reply->get('stuserial')) ;
+	$imgurl=$GLOBALS['gSiteRootPath']."photos/student.jpg";
+	$stuname="无效姓名";
+	if($stu->exists())
+	{
+		$imgurl=$GLOBALS['gSiteRootPath']."photos/".$stu->get('photo');
+		$stuname=$stu->get('stuname');
+	}
+	echo "<div class='jcomment-reply'>";
+	echo "  <div class='jcomment-photo'>";
+	echo "    <img src='".$imgurl."' width='50' height='50'>";
+	echo "  </div>";
+	echo "  <div class='jcomment-header'>";
+	echo $stuname;
+	echo "  </div>";
+	echo "  <div class='jcomment-body'>";
+	echo $reply->get('message');
+	echo "  </div>";
+	echo "  <div class='jcomment-footer'>";
+	echo edt2sh($reply->get('utime'));
+	echo "    <a href='".$GLOBALS['gSiteRootPath']."comments/index.php?view=".$cmt->get('serial')."&reply=".$reply->get('serial')."'>";
+	echo "回复";
+	echo "    </a>";
+	echo "  </div>";
+	echo "</div>";//end jcomment-reply
+
+}
+?>
+
+
+<?php 
+/* 输出单个留言 */
+function oneCommentBlock($cmt,$showreply=0)
+{
+	$stu=new tabStudent();
+	$stu->retrieve($cmt->get('bystuserial')) ;
+	$imgurl=$GLOBALS['gSiteRootPath']."photos/student.jpg";
+	$stuname="无效姓名";
+	if($stu->exists())
+	{
+		$imgurl=$GLOBALS['gSiteRootPath']."photos/".$stu->get('photo');
+		$stuname=$stu->get('stuname');
+	}
+	echo "<div class='jcomment'>";
+	echo "  <div class='jcomment-photo'>";
+	echo "    <img src='".$imgurl."' width='50' height='50'>";
+	echo "  </div>";
+	echo "  <div class='jcomment-header'>";
+	echo $stuname;
+	echo "  </div>";
+	echo "  <div class='jcomment-body'>";
+	echo $cmt->get('message');
+	echo "  </div>";
+	echo "  <div class='jcomment-footer'>";
+	echo edt2sh($cmt->get('utime'));
+	echo "    <a href='".$GLOBALS['gSiteRootPath']."comments/index.php?view=".$cmt->get('serial')."'>";
+	$c2=new tabC2() ;
+	$cnt=$c2->select("count(serial) as nr","replyserial=?",$cmt->get('serial'));
+	echo "评论(".$cnt[0]['nr'].")";
+	echo "    </a>";
+	echo "  </div>";
+	echo "</div>";//end jcomment-reply
+	if($showreply==1)
+	{
+		$c2=new tabC2() ;
+		$arr=$c2->retrieve_many("replyserial=? ORDER BY utime DESC",$cmt->get('serial'));
+		foreach ($arr as $r1 ) {
+			oneReplyBlock($cmt,$r1) ;
+		}
+	}
+}
+
+?>
+
+
+<?php function commentsBlock($nshow=5,$ipage=0,$showpager=0) { 
+	//最新留言显示 $ipage is zero based.
+	
+	?>
+
+		<?php 
+			$cmt=new tabComments();
+			$ncnt=$cmt->select("count(serial) as cnt","serial>0");
+			$totalNumComments=0+$ncnt[0]['cnt'];
+			$startindex=$ipage*$nshow;
+			$npage=ceil($totalNumComments/$nshow);
+			if( $totalNumComments == 0 ) {
+				echo "<div class='jcomment'>留言列表为空。</div>";
+			}
+
+			/*
+			$selstr="comments_table.serial as cserial, comments_table.message as cmessage, comments_table.utime as cutime, student_table.stuname as sname, student_table.photo as sphoto";
+			$frmstr="comments_table,student_table";
+			$whrstr="comments_table.bystuserial=student_table.serial GROUP BY comments_table.serial ORDER BY comments_table.utime DESC LIMIT ".$startindex.",".$nshow ;
+
+			$cmt = new tabComments() ;
+			$cmt_array = $cmt->select_mt($selstr,$frmstr,$whrstr);
+			*/
+
+			$cmt=new tabComments() ;
+			$cmt_array=$cmt->retrieve_many("serial>0 ORDER BY utime DESC LIMIT ".$startindex.",".$nshow);
+			foreach ($cmt_array as $cmt) { 
+				oneCommentBlock($cmt,0);
+			} ?>
+		<?php if( $showpager==0 && $totalNumComments>$nshow ) { ?>
+			<div class="jcomment"><a href="<?php echo $GLOBALS['gSiteRootPath'].'comments/';?>">更多... ...</a></div>
+		<?php }else if($showpager==1){ ?>
+			<ul class="pagination">
+				<li <?php if($ipage<=0) echo "class='disabled'";?>>
+					<a href="<?php if($ipage<=0) echo '#'; else echo $GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.($ipage-1);?>">&laquo;</a>
+				</li>
+				<?php 
+					$ivalid=0;
+					for ($i = $ipage-2; $i < 5+2 ; $i++) {
+						if( $i<0 ) continue ;
+						if( $i==$npage ) break;
+						$ivalid=$ivalid+1;
+						$str1="";
+						if($i==$ipage) $str1="class='active'";
+    					echo "<li ".$str1."><a href='".$GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.$i."'>".($i+1)."</a></li>";
+						if($ivalid==5) break;
+					}
+				?>
+				<li <?php if($ipage>=$npage-1) echo "class='disabled'";?>>
+					<a href="<?php if($ipage>=$npage-1) echo '#';else echo $GLOBALS['gSiteRootPath'].'comments/index.php?icpage='.($ipage+1);?>">&raquo;</a>
+				</li>
+			</ul>
+		<?php } ?>
+<?php } ?>
+
 
 
 
