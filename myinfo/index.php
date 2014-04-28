@@ -90,13 +90,13 @@
 						          {//update the old.
 						            $sfile->set('utime',time());
 						            $sfile->set('title',$obj1->rv2);
-						            $sfile->set('url',"http://gradunion.qiniu.com/".$ord->get('lesserial')."/".$ord->get('stuserial').".".$extname);
+						            $sfile->set('url',"http://gradunion.qiniudn.com/".$ord->get('lesserial')."/".$ord->get('stuserial').".".$extname);
 						            $sfile->update();
 						          }else
 						          {//create new one.
 						            $sfile->set('stuserial',$ord->get('stuserial'));
 						            $sfile->set('lesserial',$ord->get('lesserial'));
-						            $sfile->set('url',"http://gradunion.qiniu.com/".$ord->get('lesserial')."/".$ord->get('stuserial').".".$extname);
+						            $sfile->set('url',"http://gradunion.qiniudn.com/".$ord->get('lesserial')."/".$ord->get('stuserial').".".$extname);
 						            $sfile->set('utime',time());
 						            $sfile->set('title',$obj1->rv2);
 						            $sfile->create();
@@ -128,6 +128,26 @@
 						        	}
 						        	
 						        }
+							}else if(isset($_GET['delrpl']) && isset($_SESSION['stuserial']))
+							{
+								$c2=new tabC2() ;
+								$c2->retrieve($_GET['delrpl']) ;
+								if($c2->exists())
+								{
+									$delmsg=$c2->get('message');
+									$c2->delete();
+									jAlertBlock($atype="alert-success",$atitle="OK!",$amsg="已删除评论(回复) ".$delmsg );
+								}
+							}else if(isset($_GET['delcmt']) && isset($_SESSION['stuserial']))
+							{
+								$cmt=new tabComments() ;
+								$cmt->retrieve($_GET['delcmt']) ;
+								if($cmt->exists())
+								{
+									$delmsg=$cmt->get('message');
+									$cmt->delete();
+									jAlertBlock($atype="alert-success",$atitle="OK!",$amsg="已删除留言 ".$delmsg );
+								}
 							}
 						?>
 
@@ -256,7 +276,7 @@
 									foreach ($array as $obj1) { ?>
 									<tr>
 										<td><?php $i=$i+1;echo $i;?></td>
-										<td><?php echo $obj1['lt'];?></td>
+										<td><a href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?les='.$obj1['ls'];?>"><?php echo $obj1['lt'];?></a></td>
 										<td><?php if($obj1['fu']) echo fileIconImgTagBlock($obj1['fu'],$obj1['ft'],"a_id_".$i);?></td><!-- file icon-->
 										<td><a href="" onclick="showPptDialog(<?php echo $obj1['ls'].','.$obj1['os'].',\''.$obj1['lt'].'\'';?>);return false;" ><?php if(strlen($obj1['fu'])>1) echo "更新文件";else echo "上传文件";?></a> | 
 											<a href="index.php?quitles=<?php echo $obj1['os'];?>">退出课程</a>
@@ -270,9 +290,25 @@
 
 						<!-- my messages -->
 						<h4><strong>我的留言</strong></h4>
-						<?php commentsBlock(10,0,0); ?>
+						<?php
+							$cmt=new tabComments();
+							$arr=$cmt->retrieve_many("bystuserial=? ORDER BY utime DESC",$_SESSION['stuserial']);
+							foreach ($arr as $cmt) {
+								oneCommentBlock($cmt,0,1);
+							}
+						?>
 						<hr>
-
+						<h4><strong>我的评论与回复</strong></h4>
+						<?php
+							$c2=new tabC2();
+							$arr=$c2->retrieve_many("stuserial=? ORDER BY utime DESC",$_SESSION['stuserial']);
+							foreach ($arr as $c2) {
+								$cmt=new tabComments() ;
+								$cmt->retrieve($c2->get('replyserial'));
+								oneReplyBlock($cmt,$c2,1);
+							}
+						?>
+						<hr>
 						<!-- leave a comment block -->
 						<?php leaveACommentBlock(); ?>
 						

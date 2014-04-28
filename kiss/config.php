@@ -298,7 +298,9 @@ function template($iactive)
 								if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
 								else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
 								else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
+								echo "<a target='_blank' href='".$file1->get('url')."' data-toggle='tooltip' data-placement='bottom' title='".$file1->get('title')."'>";
 								echo "<img class='jlesfileicon' src='".$GLOBALS['gSiteRootPath'].$typeicon."'>";
+		        				echo "</a>";
 		        			}
 		        		?>
 		        	</li>
@@ -420,97 +422,104 @@ function template($iactive)
 <?php } ?>
 
 
+<?php
+/* 单条通知输出 */
+function oneNewsBlock($n) 
+{
+	$admin=new tabAdmin() ;
+	$admin->retrieve($n->get('byadminserial'));
 
-<?php function newsBlock($nshow=5,$ipage=0) { 
+	if($n->get('ontop')==1)
+		echo "<div class='jcomment-admin-top'>";
+	else 
+		echo "<div class='jcomment-admin'>";
+	echo "<div class='jcomment-photo'>";
+	echo "<img src='".$GLOBALS['gSiteRootPath'].'photos/'.$admin->get('photo')."' width='50' height='50'>";
+	echo "</div>";
+	if($n->get('ontop')==1)
+		echo "<div class='jcomment-header-admin-top'>";
+	else
+		echo "<div class='jcomment-header-admin'>";
+	echo $admin->get('adminname');
+	echo "</div>";
+	echo "<div class='jcomment-body'>";
+	echo $n->get('message');
+	echo "</div>";
+	echo "<div class='jcomment-footer'>";
+	echo edt2sh($n->get('utime'));
+	echo "</div>";
+	echo "</div>";
+}
+
+?>
+
+
+<?php function newsBlock($nshow=5,$ipage=0,$showpager=0) 
+{ 
 	//最新通知显示 $ipage is zero based.
-	/*
-	SELECT news_table.message AS msg, admin_table.adminname AS name
-		FROM news_table, admin_table
-		WHERE news_table.byadminserial = admin_table.serial
-		GROUP BY admin_table.serial
-		ORDER BY news_table.utime DESC 
-		LIMIT 0 , 30
+	$news=new tabNews();
+	$ncnt=$news->select("count(serial) as cnt","serial>0");
+	$totalNumNews=0+$ncnt[0]['cnt'];
+	$startindex=$ipage*$nshow;
+	$npage=ceil($totalNumNews/$nshow);
+	if( $totalNumNews == 0 ) {
+		echo "<div class='jcomment-admin'>通知列表为空。</div>";
+	}
 
-		<div class="jcomment">
-		  <div class="jcomment-photo">
-		  	<img src="photos/1-1.jpg">
-		  </div>
-		  <div class="jcomment-header">
-		    孙俪
-		  </div>
-		  <div class="jcomment-body">
-		    我选择了2014年第一期开题，欢迎大家参加.
-		  </div>
-		  <div class="jcomment-footer">
-		  	2014年1月1日 23:53 <a href="#">留言(2)</a>
-		  </div>
-		</div>
-	*/
+	$news = new tabNews() ;
+	$news_array = $news->retrieve_many("serial>0 ORDER BY ontop DESC, utime DESC LIMIT ".$startindex.",".$nshow);
 
-	?>
+	foreach ($news_array as $news) { 
+		oneNewsBlock($news);
+	}
+	if( $ipage==0 && $totalNumNews>$nshow && $showpager==0 ) { 
+		echo "<div class='jcomment-admin'><a href='".$GLOBALS['gSiteRootPath'].'news/'."'>更多...</a></div>";
+	}else
+	{
+		echo "<p>";
+		$url0=$GLOBALS['gSiteRootPath'].'news/index.php?ipage=';
+		for($i=1;$i<=$npage;$i++)
+		{
+			echo "<a href='".$url0.($i-1)."'>&nbsp;".$i."&nbsp;</a>";
+		}
+		echo "</p>";
+	}
+} 
+?>
 
-		<?php 
-			$news=new tabNews();
-			$ncnt=$news->select("count(serial) as cnt","serial>0");
-			$totalNumNews=0+$ncnt[0]['cnt'];
-			$startindex=$ipage*$nshow;
-			$npage=ceil($totalNumNews/$nshow);
-			if( $totalNumNews == 0 ) {
-				echo "<div class='jcomment-admin'>通知列表为空。</div>";
-			}
+<?php
 
-			$selstr="news_table.serial as nserial, news_table.message as nmessage, news_table.utime as nutime, news_table.ontop as nontop, admin_table.adminname as aname, admin_table.photo as aphoto";
-			$frmstr="news_table,admin_table";
-			$whrstr="news_table.byadminserial=admin_table.serial GROUP BY news_table.serial ORDER BY news_table.ontop DESC, news_table.utime DESC LIMIT ".$startindex.",".$nshow ;
+function oneFileBlock($f) 
+{
+	$ext = strtolower(pathinfo($f->get('url'), PATHINFO_EXTENSION));
+	$typeicon="img/unknownicon.jpg";
+	if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
+	else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
+	else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
 
-			$news = new tabNews() ;
-			$news_array = $news->select_mt($selstr,$frmstr,$whrstr);
+	$stu=new tabStudent() ;
+	$stu->retrieve($f->get('stuserial'));
 
-			foreach ($news_array as $news) { ?>
-
-				<div class="jcomment-admin<?php if($news['nontop']==1) echo '-top';?>">
-				  <div class="jcomment-photo">
-				  	<img src="<?php echo $GLOBALS['gSiteRootPath'].'photos/'.$news['aphoto'];?>" width='50' height='50'>
-				  </div>
-				  <div class="jcomment-header-admin<?php if($news['nontop']==1) echo '-top';?>">
-				    <?php echo $news['aname'];?>
-				  </div>
-				  <div class="jcomment-body">
-				    <?php echo $news['nmessage'];?>
-				  </div>
-				  <div class="jcomment-footer">
-				  	<?php echo edt2sh($news['nutime']);?>
-				  </div>
-				</div>
-
-		<?php }	?>
-
-		<?php if( $ipage==0 && $totalNumNews>$nshow ) { ?>
-			<div class="jcomment-admin"><a href="<?php echo $GLOBALS['gSiteRootPath'].'news/';?>">更多... ...</a></div>
-		<?php } /*if( $ipage==0 && $totalNumNews>$nshow )*/ ?>
+	echo "<div class='media' style='margin-top:5px'>";
+	echo "<a class='pull-left' target='_blank' href='".$f->get('url')."'>";
+	echo "<img class='media-object' src='".$GLOBALS['gSiteRootPath'].$typeicon."' width='32' height='32'>";
+	echo "</a>";
+	echo "<div class='media-body'>";
+	echo "<h5 class='media-heading'>".$stu->get('stuname')."</h5>";
+	echo $f->get('title');
+	echo "<p class='jfwfupdate'>".edt2sh($f->get('utime'))."</p>";
+	echo "</div>";
+	echo "<hr style='margin-top:0px;margin-bottom:5px'>";
+	echo "</div>";
+}
+?>
 
 
-<?php } ?>
+<?php 
 
-
-
-
-
-<?php function filesBlock($nshow=5,$ipage=0) { 
+function filesBlock($nshow=5,$ipage=0,$showpager=0) { 
 	//最新文件显示 $ipage is zero based.
-	/*
-	<div class="media">
-	  <a class="pull-left" href="#">
-		<img class="media-object" src="img/pdficon.jpg" alt="pdf"  width="32" height="32">
-	  </a>
-	  <div class="media-body">
-		<h4 class="media-heading">Student Zhao</h4>
-		IGARSS会议报告及行程
-		<p class="jfwfupdate">2014.5.2</p>
-	  </div>
-	  <hr>
-	</div>
-	*/
+
 		$file=new tabStufile();
 		$ncnt=$file->select("count(serial) as cnt","serial>0");
 		$total=0+$ncnt[0]['cnt'];
@@ -521,41 +530,28 @@ function template($iactive)
 			echo "<div class='media' style='margin-top:5px'>文件列表为空。</div>";
 		}
 
-		$selstr="stufile_table.serial as fserial, stufile_table.url as furl, stufile_table.utime as futime, stufile_table.lesserial as flserial, stufile_table.title as ftitle, student_table.stuname as sname";
-		$frmstr="stufile_table,student_table";
-		$whrstr="stufile_table.stuserial=student_table.serial GROUP BY stufile_table.serial ORDER BY stufile_table.utime DESC LIMIT ".$startindex.",".$nshow ;
+		$file = new tabStufile() ;
+		$file_array = $file->retrieve_many("serial>0 ORDER BY utime DESC LIMIT ".$startindex.",".$nshow);
 
-			$file = new tabStufile() ;
-			$file_array = $file->select_mt($selstr,$frmstr,$whrstr);
+		foreach ($file_array as $file) { 
+			oneFileBlock($file);
+		} 
 
-			foreach ($file_array as $file) { 
-				$ext = strtolower(pathinfo($file['furl'], PATHINFO_EXTENSION));
-				$typeicon="img/unknownicon.jpg";
-				if( strcmp($ext,"pdf")==0 ) $typeicon="img/pdficon.jpg";
-				else if( strcmp($ext,"ppt")==0 ) $typeicon="img/ppticon.jpg";
-				else if( strcmp($ext,"pptx")==0) $typeicon="img/pptxicon.jpg";
-
-				?>
-
-				<div class="media" style="margin-top:5px">
-				  <a class="pull-left" href="#">
-					<img class="media-object" src="<?php echo $GLOBALS['gSiteRootPath'].$typeicon;?>" alt="pdf"  width="32" height="32">
-				  </a>
-				  <div class="media-body">
-					<h5 class="media-heading"><?php echo $file['sname'];?></h5>
-					<?php echo $file['ftitle'];?>
-					<p class="jfwfupdate"><?php echo edt2sh($file['futime']);?></p>
-				  </div>
-				  <hr style="margin-top:0px;margin-bottom:5px">
-				</div>
-
-		<?php } ?>
-		<?php if( $ipage==0 && $total>$nshow ) { ?>
-			<div class="media"><a href="<?php echo $GLOBALS['gSiteRootPath'].'file/';?>">更多... ...</a></div>
-		<?php } /* endif( $ipage==0 && $total>$nshow )*/ ?>
+		if( $ipage==0 && $total>$nshow && $showpager==0 ) { 
+			echo "<div class='media'><a href='".$GLOBALS['gSiteRootPath'].'file/'."'>更多...</a></div>";
+		}else
+		{
+			echo "<p>";
+			$url0=$GLOBALS['gSiteRootPath'].'file/index.php?ipage=';
+			for($i=1;$i<=$npage;$i++)
+			{
+				echo "<a href='".$url0.($i-1)."'>&nbsp;".$i."&nbsp;</a>";
+			}
+			echo "</p>";
+		}
+} ?>
 
 
-<?php } ?>
 
 
 <?php function topNaviBlock() 
@@ -781,7 +777,7 @@ function template($iactive)
 
 <?php
 /* 输出单个留言评论 */
-function oneReplyBlock($cmt,$reply)
+function oneReplyBlock($cmt,$reply,$candelete=0)
 {
 	$stu=new tabStudent();
 	$stu->retrieve($reply->get('stuserial')) ;
@@ -804,8 +800,14 @@ function oneReplyBlock($cmt,$reply)
 	echo "  </div>";
 	echo "  <div class='jcomment-footer'>";
 	echo edt2sh($reply->get('utime'));
+	if($candelete==1)
+	{
+		echo "<a href='".$GLOBALS['gSiteRootPath']."myinfo/index.php?delrpl=".$reply->get('serial')."'>";
+		echo "|&nbsp;删除&nbsp;" ;
+		echo "</a>" ;
+	}
 	echo "    <a href='".$GLOBALS['gSiteRootPath']."comments/index.php?view=".$cmt->get('serial')."&reply=".$reply->get('serial')."'>";
-	echo "回复";
+	echo "&nbsp;回复&nbsp;";
 	echo "    </a>";
 	echo "  </div>";
 	echo "</div>";//end jcomment-reply
@@ -816,7 +818,7 @@ function oneReplyBlock($cmt,$reply)
 
 <?php 
 /* 输出单个留言 */
-function oneCommentBlock($cmt,$showreply=0)
+function oneCommentBlock($cmt,$showreply=0,$candelete=0)
 {
 	$stu=new tabStudent();
 	$stu->retrieve($cmt->get('bystuserial')) ;
@@ -839,10 +841,16 @@ function oneCommentBlock($cmt,$showreply=0)
 	echo "  </div>";
 	echo "  <div class='jcomment-footer'>";
 	echo edt2sh($cmt->get('utime'));
+	if($candelete==1)
+	{
+		echo "<a href='".$GLOBALS['gSiteRootPath']."myinfo/index.php?delcmt=".$cmt->get('serial')."'>";
+		echo "|&nbsp;删除&nbsp;" ;
+		echo "</a>" ;
+	}
 	echo "    <a href='".$GLOBALS['gSiteRootPath']."comments/index.php?view=".$cmt->get('serial')."'>";
 	$c2=new tabC2() ;
 	$cnt=$c2->select("count(serial) as nr","replyserial=?",$cmt->get('serial'));
-	echo "评论(".$cnt[0]['nr'].")";
+	echo "&nbsp;评论(".$cnt[0]['nr'].")&nbsp;";
 	echo "    </a>";
 	echo "  </div>";
 	echo "</div>";//end jcomment-reply
@@ -913,7 +921,6 @@ function oneCommentBlock($cmt,$showreply=0)
 			</ul>
 		<?php } ?>
 <?php } ?>
-
 
 
 

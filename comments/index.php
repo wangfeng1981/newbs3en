@@ -100,7 +100,7 @@
 						 	$ipage=0;
 						 	if(isset($_GET['icpage']))
 						 		$ipage=intval($_GET['icpage']);
-						 	commentsBlock(10,$ipage,1);
+						 	commentsBlock(20,$ipage,1);
 						 	echo "<hr>";
 						 	leaveACommentBlock(0,0);
 						 } 
