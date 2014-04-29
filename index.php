@@ -46,10 +46,8 @@
 					  	</div>
 					</div>
 					<div class="col-md-6 column">
-						<h4><strong>最新课程</strong></h4>
-						<hr>
-						<!-- 课程分类列表 -->
-						<?php activityBlock(1,0,0); ?>
+						
+						<?php activityBlock(1,0,0) ; ?>
 
 						<hr>
 						<h4><strong>最新文件资源</strong></h4>

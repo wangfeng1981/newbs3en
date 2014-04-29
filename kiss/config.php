@@ -23,6 +23,7 @@ $GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
 			$this->rs['desc']='';
 			$this->rs['utime']=0;
 			$this->rs['state']=0;
+			$this->rs['image']='';
 		}
 	}
 	//=====================================================
@@ -324,12 +325,57 @@ function template($iactive)
 	<?php 
 		if($displayMode==1) 
 		{ 
-			$les=new tabLesson();
-			$array = $les->retrieve_many("serial>0 ORDER BY utime DESC LIMIT 0,6");
-			foreach ($array as $les){
-				printOneLesson($les,2) ;
-			}
-			if(count($array)>5) echo "<p><a href='".$GLOBALS['gSiteRootPath']+"activity/'>更多课程...</a></p>";
+			$act=new tabActivity();
+			$array=$act->retrieve_many("serial>0 ORDER BY utime DESC");
+			$nact=count($array);
+			?>
+			<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+			  <!-- Indicators -->
+			  <ol class="carousel-indicators">
+			  	<?php 
+			  		for($i=0;$i<$nact;$i++)
+			  		{
+			  			if($i==0)
+			  				echo "<li data-target='#carousel-example-generic' data-slide-to='".$i."' class='active'></li>";
+			  			else
+			  				echo "<li data-target='#carousel-example-generic' data-slide-to='".$i."' ></li>";
+			  		}
+			  	?>
+			  </ol>
+
+			  <!-- Wrapper for slides -->
+			  <div class="carousel-inner">
+			  	<?php 
+			  		for($i=0;$i<$nact;$i++)
+			  		{
+			  			$act1=$array[$i];
+			  			if($i==0)
+			  				echo "<div class='item active'>";
+			  			else
+			  				echo "<div class='item'>";
+			  			$imgurl=$act1->get('image');
+			  			if(strlen($imgurl)<2)
+			  				$imgurl="img/act01.jpg";
+			  			echo "<img src='".$imgurl."'>";
+			  			echo "<div class='carousel-caption'>";
+			  			echo "<h3>".$act1->get('title')."</h3>";
+			        	
+			        	echo "<p><a class='btn btn-primary btn-lg' role='button' href='".$GLOBALS['gSiteRootPath'].'activity/index.php?act='.$act1->get('serial')."'>查看详情</a></p>";
+			  			echo "</div></div>";
+			  		}
+			  	?>
+			  </div>
+
+			  <!-- Controls -->
+			  <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+			    <span class="glyphicon glyphicon-chevron-left"></span>
+			  </a>
+			  <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+			    <span class="glyphicon glyphicon-chevron-right"></span>
+			  </a>
+			</div>
+			
+		<?php 
 		}/* endif displayMode==1 */ 
 		else if($displayMode==2){
 			$act=new tabActivity();
@@ -344,10 +390,10 @@ function template($iactive)
 
 			foreach ($array as $act) { 
 	?>
-				<div class="panel panel-default" style="border-width:2px">
+				<div class="panel panel-primary" style="border-width:2px">
 				  <!-- Default panel contents -->
 				  <div class="panel-heading">
-				  	<a style="display:block;text-decoration:none" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?act='.$act->get('serial'); ?>" >
+				  	<a style="display:block;color:white" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?act='.$act->get('serial'); ?>" >
 				  		<strong><?php echo $act->get('title');?></strong>
 				  	</a>
 				  </div>
