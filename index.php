@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>研究生课程小助手-首页</title>
+    <title>研究生学术活动小助手-首页</title>
 
     <!-- Bootstrap core CSS -->
 	<link href="css/jfwfdocs.min.css" rel="stylesheet">

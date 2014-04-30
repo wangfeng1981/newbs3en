@@ -119,12 +119,12 @@
 						        			jAlertBlock($atype="alert-success",$atitle="OK!",$amsg="已退出 ".$les2->get('title') );
 						        		}else
 						        		{
-						        			jAlertBlock($atype="alert-danger",$atitle="错误!",$amsg="无法退出 ".$les2->get('title').",可能因为课程已关闭或者锁定,如果确实想退出请联系管理员." );
+						        			jAlertBlock($atype="alert-danger",$atitle="错误!",$amsg="无法退出 ".$les2->get('title').",可能因为学术活动已关闭或者锁定,如果确实想退出请联系管理员." );
 						        		}
 						        	}else
 						        	{
 						        		$ord->delete();
-						        		jAlertBlock($atype="alert-warning",$atitle="注意!",$amsg="课程已失效,已退出本次课程.");
+						        		jAlertBlock($atype="alert-warning",$atitle="注意!",$amsg="学术活动已失效,已退出本次学术活动.");
 						        	}
 						        	
 						        }
@@ -262,10 +262,10 @@
 						<hr>
 
 						<!-- my lesson orders -->
-						<h4><strong>我的课程</strong></h4>
+						<h4><strong>我的学术活动</strong></h4>
 						<table class="table table-striped table-hover">
 						  <thead>
-								<tr><th>#</th><th>课程</th><th>文件</th><th>操作</th></tr>
+								<tr><th>#</th><th>学术活动</th><th>文件</th><th>操作</th></tr>
 							</thead>
 							<tbody>
 								<?php 
@@ -279,7 +279,7 @@
 										<td><a href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?les='.$obj1['ls'];?>"><?php echo $obj1['lt'];?></a></td>
 										<td><?php if($obj1['fu']) echo fileIconImgTagBlock($obj1['fu'],$obj1['ft'],"a_id_".$i);?></td><!-- file icon-->
 										<td><a href="" onclick="showPptDialog(<?php echo $obj1['ls'].','.$obj1['os'].',\''.$obj1['lt'].'\'';?>);return false;" ><?php if(strlen($obj1['fu'])>1) echo "更新文件";else echo "上传文件";?></a> | 
-											<a href="index.php?quitles=<?php echo $obj1['os'];?>">退出课程</a>
+											<a href="index.php?quitles=<?php echo $obj1['os'];?>">退出</a>
 										</td><!-- add file or update file, quit lesson.-->
 									</tr>
 									<?php $numActivateTooltip=$i; ?>
@@ -334,7 +334,7 @@
 
 			  <!-- Text input-->
 			  <div class="form-group">
-			    <label class="col-md-4 control-label" for="lestitle">课程</label>  
+			    <label class="col-md-4 control-label" for="lestitle">学术活动</label>  
 			    <div class="col-md-4">
 			    <input id="lestitle" name="lestitle" type="text" placeholder="" class="form-control input-md" disabled='disabled'>
 			      

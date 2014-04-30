@@ -6,7 +6,7 @@ require('kissmvc.php');
 //===============================================
 // 全局变量
 //===============================================
-$GLOBALS['gSiteRootPath']='http://jfwf.erufa.com/yslt/newbs3en/';
+$GLOBALS['gSiteRootPath']='http://www.gradunion.cn/';
 
 //===============================================
 // 数据库
@@ -199,7 +199,7 @@ function template($iactive)
 	$pages = array(
 		array("","首页"),
 		array("myinfo","我的资料"),
-		array("activity","课程"),
+		array("activity","学术活动"),
 		array("news","通知"),
 		array("comments","留言"),
 		array("file","文件资源"),
@@ -239,42 +239,46 @@ function template($iactive)
 	$nlast=$lesobj->get('maxnum')-$ncnt;
 
 	?>
-	<!-- 课程批次 -->
+	<!-- 学术活动批次 -->
 
 	<?php 
 	if($displayMode==1)
 	{
 		echo "<a href='".$GLOBALS['gSiteRootPath']."activity/index.php?les=".$lesobj->get('serial')."' class='list-group-item'>";
 		echo "<strong>".$lesobj->get('title')."</strong>";
-		if($lesobj->get('state')==1) echo "<span class='label label-info pull-right'>开放</span>";
-		else echo "<span class='label label-warning pull-right'>关闭</span>";
-		echo "<span class='label label-success pull-right'>剩余".$nlast."人</span>";
+		if($lesobj->get('state')==1) echo "<span class='label label-default pull-right'>开放,剩余".$nlast."</span>";
+		else echo "<span class='label label-default pull-right'>关闭</span>";
 		echo "<p>".$lesobj->get('desc')."</p>";
 		echo "</a>";
 	}
 	else if($displayMode>1) { 
 	?>
-		<div class="panel panel-default">
+		<div class="panel panel-primary">
 	      <div class="panel-heading">
-	        <a href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?les='.$lesobj->get('serial');?>" style="color:black;display:block;text-decoration:none">
+	        <a style="color:white" href="<?php echo $GLOBALS['gSiteRootPath'].'activity/index.php?les='.$lesobj->get('serial');?>" style="color:black;display:block;text-decoration:none">
 	        	<strong>
 	        		<?php echo $lesobj->get('title');?>
 	        	</strong>
-	        	<span class="label label-<?php if($lesobj->get('state')==1) echo 'info';else echo 'warning';?> pull-right">
-	        		<?php echo $statestr;?>
+	        	<span class="label label-default pull-right">
+	        		<?php echo $statestr;
+	        			if($lesobj->get('state')==1)
+	        			{
+	        				echo ",剩余".$nlast.",最多".$lesobj->get('maxnum');
+	        			}
+	        		;?>
 	        	</span>
 	        </a>
 	      </div>
 	      <div class="panel-body">
 	        <?php echo $lesobj->get('desc'); ?>
 	        <p class="jfwfupdate"><?php echo edt2sh($lesobj->get('utime'));?></p>
+	        <p>
+	        	<a role="button" class="btn btn-primary btn-sm" <?php if($lesobj->get('state')!=1||isset($_SESSION['stuserial'])==false) echo "disabled='disabled'"; else echo "href='".$GLOBALS['gSiteRootPath']."activity/index.php?join=".$lesobj->get('serial')."'";?>>
+	        	加入学术活动
+	        	</a>
+	    	</p>
 	      </div>
-	      <div class="panel-footer" style="position:relative">
-	        <span class="label label-success">剩余<?php echo $nlast;?>人</span>
-	        <span class="label label-default">最多<?php echo $lesobj->get('maxnum');?>人</span>
-	        <a role="button" class="btn btn-primary btn-sm" style="position:absolute;right:10px;top:5px" <?php if($lesobj->get('state')!=1||isset($_SESSION['stuserial'])==false) echo "disabled='disabled'"; else echo "href='".$GLOBALS['gSiteRootPath']."activity/index.php?join=".$lesobj->get('serial')."'";?>>
-	        	加入课程</a>
-	      </div>
+	      
 	      <?php if($displayMode>2){ 
 	      	$order = new tabLesorder() ;
 	      	$selstr="student_table.serial as serial1,student_table.stuname as name1,student_table.photo as photo1";
@@ -316,7 +320,7 @@ function template($iactive)
 
 
 <?php function activityBlock($displayMode=1,$actserial=0,$lesserial=0) { 
-	//课程分类及相关批次课程摘要显示
+	//学术活动分类及相关批次学术活动摘要显示
 	//displayMode=1 for index.php; 
 	//displayMode=2 for activity/index.php;
 	//displayMode=3 for activity/index.php?act=xxx ;
@@ -358,7 +362,7 @@ function template($iactive)
 			  				$imgurl="img/act01.jpg";
 			  			echo "<img src='".$imgurl."'>";
 			  			echo "<div class='carousel-caption'>";
-			  			echo "<h3>".$act1->get('title')."</h3>";
+			  			echo "<h3><strong><font face='SimHei'>".$act1->get('title')."</font></strong></h3>";
 			        	
 			        	echo "<p><a class='btn btn-primary btn-lg' role='button' href='".$GLOBALS['gSiteRootPath'].'activity/index.php?act='.$act1->get('serial')."'>查看详情</a></p>";
 			  			echo "</div></div>";
@@ -409,7 +413,7 @@ function template($iactive)
 						$array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
 						if( count($array)==0 )
 						{
-							echo "<a class='list-group-item'><p class='list-group-item-text'>课程批次列表为空。</p></a>";
+							echo "<a class='list-group-item'><p class='list-group-item-text'>学术活动批次列表为空。</p></a>";
 						}else
 						{
 							foreach ($array as $les ) {
@@ -430,16 +434,23 @@ function template($iactive)
 			if($act->exists())
 			{
 				echo "<ol class='breadcrumb'>";
-				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/'>".全部课程."</a></li>";
+				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/'>".全部学术活动."</a></li>";
 				echo "<li>".$act->get('title')."</li>";
 				echo "</ol>";
 			}
-			
-			$les=new tabLesson();
-			$array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$actserial);
-			foreach ($array as $les){
-				printOneLesson($les,2) ;
+			echo "<div class='list-group'>";
+			$les = new tabLesson();
+			$array = $les->retrieve_many("actserial=? ORDER BY utime DESC",$act->get('serial'));
+			if( count($array)==0 )
+			{
+				echo "<a class='list-group-item'><p class='list-group-item-text'>学术活动批次列表为空。</p></a>";
+			}else
+			{
+				foreach ($array as $les ) {
+					printOneLesson($les,1);
+				}
 			}
+			echo "</div>";
 		?>
 	<?php } /*end elseif displayMode==3 */  
 	else if($displayMode==4) { ?>
@@ -451,7 +462,7 @@ function template($iactive)
 			if($selarray)
 			{
 				echo "<ol class='breadcrumb'>";
-				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/'>".全部课程."</a></li>";
+				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/'>".全部学术活动."</a></li>";
 				echo "<li><a href='".$GLOBALS['gSiteRootPath']."activity/index.php?act=".$selarray[0]['actserial']."''>".$selarray[0]['acttitle']."</a></li>";
 				echo "<li>".$selarray[0]['ltitle']."</li>";
 				echo "</ol>";
@@ -518,8 +529,9 @@ function oneNewsBlock($n)
 	foreach ($news_array as $news) { 
 		oneNewsBlock($news);
 	}
-	if( $ipage==0 && $totalNumNews>$nshow && $showpager==0 ) { 
-		echo "<div class='jcomment-admin'><a href='".$GLOBALS['gSiteRootPath'].'news/'."'>更多...</a></div>";
+	if( $showpager==0 ) { 
+		if( $ipage==0 && $totalNumNews>$nshow )
+			echo "<div class='jcomment-admin'><a href='".$GLOBALS['gSiteRootPath'].'news/'."'>更多...</a></div>";
 	}else
 	{
 		echo "<p>";
@@ -583,8 +595,9 @@ function filesBlock($nshow=5,$ipage=0,$showpager=0) {
 			oneFileBlock($file);
 		} 
 
-		if( $ipage==0 && $total>$nshow && $showpager==0 ) { 
-			echo "<div class='media'><a href='".$GLOBALS['gSiteRootPath'].'file/'."'>更多...</a></div>";
+		if( $showpager==0 ) { 
+			if($ipage==0 && $total>$nshow)
+				echo "<div class='media'><a href='".$GLOBALS['gSiteRootPath'].'file/'."'>更多...</a></div>";
 		}else
 		{
 			echo "<p>";
