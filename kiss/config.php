@@ -219,7 +219,8 @@ function template($iactive)
 				<?php } ?>
 			</li>
 		<?php }	?>
-
+		<hr>
+		<li><a href='adminpage/gcrud/index.php/teacher/student_management'>管理员入口</a></li>
 	</ul>
 <?php } ?>
 
