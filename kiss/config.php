@@ -220,7 +220,7 @@ function template($iactive)
 			</li>
 		<?php }	?>
 		<hr>
-		<li><a href='adminpage/gcrud/index.php/teacher/student_management'>管理员入口</a></li>
+		<li><a href="<?php echo $GLOBALS['gSiteRootPath'];?>adminpage/gcrud/index.php/teacher/student_management">管理员入口</a></li>
 	</ul>
 <?php } ?>
 
@@ -653,7 +653,7 @@ function filesBlock($nshow=5,$ipage=0,$showpager=0) {
 			 	<span class="icon-bar"></span>
 			 	<span class="icon-bar"></span>
 			 </button> 
-			 <a class="navbar-brand" href="<?php echo $GLOBALS['gSiteRootPath'];?>">研究生选课小助手</a>
+			 <a class="navbar-brand" href="<?php echo $GLOBALS['gSiteRootPath'];?>">遥感地球所-研究生学术活动小助手</a>
 		</div>
 		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -688,7 +688,10 @@ function filesBlock($nshow=5,$ipage=0,$showpager=0) {
 	<!-- footer: copyright , date , develope team , etc  -->
 	<footer class="bs-docs-footer" role="contentinfo">
 	  <div class="container">
-	    <p>Designed and built by <a href="mailto:#">wangfeng@irsa.ac.cn</a>. Copyright © 2014 gradunion.cn</p>
+	    <p>Designed and built by <a href="mailto:#">wangfeng@irsa.ac.cn</a>. Copyright © 2014 中国科学院遥感与数字地球研究所,gradunion.cn</p>
+	  	<p> </p>
+	  	<p> </p>
+	  	<p><a href="http://www.radi.ac.cn"><img width='320' height='40' src="<?php echo $GLOBALS['gSiteRootPath'];?>img/radibanner.jpg"></a></p>
 	  </div>
 	</footer>
 <?php } ?>
